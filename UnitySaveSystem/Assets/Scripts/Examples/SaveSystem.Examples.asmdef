@@ -1,0 +1,17 @@
+{
+    "name": "SaveSystem.Examples",
+    "rootNamespace": "SaveSystem.Examples",
+    "references": [
+        "GUID:6cca03abf81484a2ea05b3182f92d83c",
+        "GUID:a947b4539a07f4905842bb93c51e3313"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
