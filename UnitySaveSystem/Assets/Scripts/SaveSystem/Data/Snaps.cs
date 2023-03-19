@@ -8,6 +8,7 @@ using System;
 
 namespace SaveSystem.Data
 {
+    [System.Serializable]
     public class SaveSnap : IEqualityComparer<SaveSnap>
     {
         private Func<MonoBehaviour> _monoGetter;
