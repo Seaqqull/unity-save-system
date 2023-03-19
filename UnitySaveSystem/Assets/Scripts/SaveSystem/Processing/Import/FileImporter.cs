@@ -25,10 +25,10 @@ namespace SaveSystem.Processing.Import
             if (!File.Exists($"{_folder}/{_file}"))
                 File.Create($"{_folder}/{_file}");
             
-            var fileHandler = new FileStream(
+            using var fileHandler = new FileStream(
                 $"{_folder}/{_file}", 
                 FileMode.OpenOrCreate, 
-                FileAccess.ReadWrite, 
+                FileAccess.Read, 
                 FileShare.None);
 
             try
@@ -37,7 +37,8 @@ namespace SaveSystem.Processing.Import
             }
             catch (Exception e)
             {
-                throw new ArgumentException($"[System] Error exporting data from file: [{_folder + "/" + _file}] => {e.Message}");
+                throw new ArgumentException(
+                    $"[System] Error importing data from file: [{_folder + "/" + _file}] => {e.Message}");
             }
         }
         

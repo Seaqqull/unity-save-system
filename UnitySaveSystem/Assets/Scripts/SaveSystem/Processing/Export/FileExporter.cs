@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 
@@ -24,12 +25,21 @@ namespace SaveSystem.Processing.Export
             if (!File.Exists($"{_folder}/{_file}"))
                 File.Create($"{_folder}/{_file}");
             
-            var fileHandler = new FileStream(
+            using var fileHandler = new FileStream(
                 $"{_folder}/{_file}", 
                 FileMode.OpenOrCreate, 
-                FileAccess.ReadWrite, 
+                FileAccess.Write, 
                 FileShare.None);
-            ExportData(fileHandler, data);
+            
+            try
+            {
+                ExportData(fileHandler, data);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(
+                    $"[System] Error exporting data from file: [{_folder + "/" + _file}] => {e.Message}");
+            }
         }
         
         

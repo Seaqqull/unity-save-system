@@ -21,7 +21,7 @@ namespace SaveSystem
         }
 
 
-        private void Awake()
+        protected virtual void Awake()
         {
             if (Id == null) InitializeId();
         }

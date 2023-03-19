@@ -24,6 +24,11 @@ namespace SaveSystem
             SaveManager.Instance.AddToSavable(this);
         }
 
+        private void OnDestroy()
+        {
+            SaveManager.Instance.RemoveFromSavable(this);
+        }
+
 
         public void Clear()
         {

@@ -18,7 +18,7 @@ namespace SaveSystem.Processing.Import
             stream.Position = 0;
 
             if (stream.Length <= 0)
-                throw new Exception("Cannot import saves.");
+                return new SnapshotDatabase();
             
             var data = (SnapshotDatabase)formatter.Deserialize(stream);
             return data;

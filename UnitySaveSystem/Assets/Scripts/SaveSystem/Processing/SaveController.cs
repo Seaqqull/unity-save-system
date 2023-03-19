@@ -19,7 +19,7 @@ namespace SaveSystem
         public IReadOnlyCollection<SaveSnapshot> Snapshots =>
             (_workDatabasePath == null) ? Array.Empty<SaveSnapshot>() : _database.Snapshots;
         public string DefaultTitle =>
-            DateTime.Now.ToBinary().ToString("HH:mm:ss MM/dd/yyyy");
+            DateTime.Now.ToString("HH:mm:ss MM/dd/yyyy");
 
 
         public SaveController(string databasePath, string databaseFile)
@@ -53,7 +53,7 @@ namespace SaveSystem
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error occured during saving: {e.Message}");
+                Debug.LogError($"Error occurred during saving: {e.Message}");
             }
         }
 
