@@ -1,0 +1,16 @@
+{
+    "name": "SaveSystem.Implementation",
+    "rootNamespace": "SaveSystem",
+    "references": [
+        "GUID:6cca03abf81484a2ea05b3182f92d83c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
