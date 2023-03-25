@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SaveSystem.Additional.Actions.Specific
 {
     [CreateAssetMenu(fileName = "SceneSaveAction", menuName = "Actions/Simple/SaveScene", order = 0)]
-    public class SceneSaveActionSO : ActionSO
+    public class SaveSceneActionSO : ActionSO
     {
         public override void Do()
         {
