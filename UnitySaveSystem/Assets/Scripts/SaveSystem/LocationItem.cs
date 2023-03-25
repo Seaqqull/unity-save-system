@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SaveSystem
 {
-     public class LocationItem : MonoBehaviour, ISavable
+    public class LocationItem : MonoBehaviour, ISavable
     {
         private bool _exists = true;
         

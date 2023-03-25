@@ -8,7 +8,7 @@ using System;
 
 namespace SaveSystem.Data
 {
-    [System.Serializable]
+    [Serializable]
     public class SaveSnap : IEqualityComparer<SaveSnap>
     {
         private Func<MonoBehaviour> _monoGetter;
@@ -84,14 +84,14 @@ namespace SaveSystem.Data
         }
     }
     
-    [System.Serializable]
+    [Serializable]
     public class SaveSnapshot
     {
         public string Title = string.Empty;
         public HashSet<SaveSnap> Data = new();
     }
     
-    [System.Serializable]
+    [Serializable]
     public class SnapshotDatabase : ISerializable
     {
         public List<SaveSnapshot> Snapshots { get; set; } = new ();

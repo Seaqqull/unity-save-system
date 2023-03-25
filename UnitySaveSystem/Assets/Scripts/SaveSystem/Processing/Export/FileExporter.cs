@@ -1,5 +1,5 @@
-using System;
 using System.IO;
+using System;
 
 
 namespace SaveSystem.Processing.Export
@@ -9,9 +9,9 @@ namespace SaveSystem.Processing.Export
     {
         private string _folder;
         private string _file;
-        
-        
-        public FileExporter(string folder, string file)
+
+
+        protected FileExporter(string folder, string file)
         {
             _folder = folder;
             _file = file;

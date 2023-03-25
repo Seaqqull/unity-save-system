@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
-using System.IO;
 using SaveSystem.Data;
+using System.IO;
 
 
 namespace SaveSystem.Processing.Export
@@ -13,7 +13,6 @@ namespace SaveSystem.Processing.Export
         
         protected override void ExportData(FileStream stream, SnapshotDatabase data)
         {
-
             IFormatter formatter = new BinaryFormatter();
             stream.Position = 0;
             

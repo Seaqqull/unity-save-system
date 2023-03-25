@@ -1,15 +1,17 @@
-using System.Collections.Generic;
-using UnityEngine;
-using System;
-using SaveSystem.Data;
 using SaveSystem.Processing.Export;
 using SaveSystem.Processing.Import;
+using System.Collections.Generic;
+using SaveSystem.Data;
+using UnityEngine;
+using System;
 
 
 namespace SaveSystem
 {
     public class SaveController
     {
+        private const string DEFAULT_DATE_FORMAT = "HH:mm:ss MM/dd/yyyy";
+        
         private string _databaseFile;
 
         private SnapshotDatabase _database = new();
@@ -19,7 +21,7 @@ namespace SaveSystem
         public IReadOnlyCollection<SaveSnapshot> Snapshots =>
             (_workDatabasePath == null) ? Array.Empty<SaveSnapshot>() : _database.Snapshots;
         public string DefaultTitle =>
-            DateTime.Now.ToString("HH:mm:ss MM/dd/yyyy");
+            DateTime.Now.ToString(DEFAULT_DATE_FORMAT);
 
 
         public SaveController(string databasePath, string databaseFile)
@@ -111,6 +113,5 @@ namespace SaveSystem
             _database.Snapshots.Remove(snapshot);
             SaveSnapshots();
         }
-        
     }
 }

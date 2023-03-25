@@ -9,9 +9,9 @@ namespace SaveSystem.Processing.Import
     {
         private string _folder;
         private string _file;
-        
-        
-        public FileImporter(string folder, string file)
+
+
+        protected FileImporter(string folder, string file)
         {
             _folder = folder;
             _file = file;

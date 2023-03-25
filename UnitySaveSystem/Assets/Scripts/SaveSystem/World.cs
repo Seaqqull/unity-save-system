@@ -12,7 +12,7 @@ namespace SaveSystem
         private const string WORLD_NAME = "Game";
         #endregion
         
-        private List<SaveSnap> _locations = new ();
+        private List<SaveSnap> _locationSnaps = new ();
         private Location _activeLocation;
         
         public string Id => 
@@ -32,21 +32,18 @@ namespace SaveSystem
 
         public void Clear()
         {
-            _locations.Clear();
+            _locationSnaps.Clear();
         }
 
         public void AddLocation(Location newLocation)
         {
             _activeLocation = newLocation;
             
-            var locationSnap = _locations.SingleOrDefault(location => location.Id.Equals(newLocation.Id));
+            var locationSnap = _locationSnaps.SingleOrDefault(location => location.Id.Equals(newLocation.Id));
             if (locationSnap != null)
-            {
                 newLocation.FromSnap(locationSnap);
-                // _locations = _locations.Where(location => !location.Id.Equals(newLocation.Id)).ToList();
-            }
             
-            _locations = _locations.Where(location => !location.Id.Equals(newLocation.Id)).ToList();
+            _locationSnaps = _locationSnaps.Where(location => !location.Id.Equals(newLocation.Id)).ToList();
             // _locations.Add(newLocation.MakeSnap());
         }
         
@@ -54,8 +51,8 @@ namespace SaveSystem
         {
             if (_activeLocation == newLocation)
             {
-                _locations = _locations.Where(location => !location.Id.Equals(newLocation.Id)).ToList();
-                _locations.Add(newLocation.MakeSnap());
+                _locationSnaps = _locationSnaps.Where(location => !location.Id.Equals(newLocation.Id)).ToList();
+                _locationSnaps.Add(newLocation.MakeSnap());
                 return;
             }
 
@@ -66,7 +63,7 @@ namespace SaveSystem
         #region Savable
         public SaveSnap MakeSnap()
         {
-            return new WorldSnap(Id, _locations);
+            return new WorldSnap(Id, _locationSnaps);
         }
 
         public void FromSnap(SaveSnap data)
@@ -75,10 +72,10 @@ namespace SaveSystem
             if ((worldData == null) || !worldData.Id.Equals(Id))
                 return;
             
-            _locations = worldData.Locations.ToList();
+            _locationSnaps = worldData.Locations.ToList();
             if (_activeLocation != null)
             {
-                var locationSnap = _locations.SingleOrDefault(location => location.Id.Equals(_activeLocation.Id));
+                var locationSnap = _locationSnaps.SingleOrDefault(location => location.Id.Equals(_activeLocation.Id));
                 if (locationSnap != null)
                 {
                     _activeLocation.FromSnap(locationSnap);

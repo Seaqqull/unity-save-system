@@ -16,6 +16,7 @@ namespace SaveSystem
         private List<ISavable> _savables = new();
         private SaveController _controller;
 
+        public event Action<SaveSnapshot> OnLoad;
         public event Action OnSave;
 
         public IReadOnlyCollection<SaveSnapshot> Snapshots => 
@@ -56,6 +57,8 @@ namespace SaveSystem
         public SaveSnapshot Load(int snapshotIndex)
         {
             var snapshot = _controller.GetSnapshot(snapshotIndex);
+            OnLoad?.Invoke(snapshot);
+            
             return snapshot;
         }
         

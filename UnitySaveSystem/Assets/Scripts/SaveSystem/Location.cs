@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using SaveSystem.Base;
 using SaveSystem.Data;
 using UnityEngine;
+using System.Linq;
 
 
 namespace SaveSystem
@@ -23,21 +23,7 @@ namespace SaveSystem
             if (World.Instance != null)
                 World.Instance.AddLocation(this);
         }
-
-
-        public void UpdateItemExistence(SaveSnap existingItemSnap)
-        {
-            var itemSnapshot = _itemsSnapshot.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id));
-            if (itemSnapshot == null) return;
-            
-            _itemsSnapshot = _itemsSnapshot.Where(item => !item.Id.Equals(existingItemSnap.Id)).ToList();
-            _itemsSnapshot.Add(existingItemSnap);
-            
-            if (_locationItems.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id)) is LocationItem locationItem)
-                locationItem.FromSnap(existingItemSnap);
-            
-            World.Instance.UpdateLocation(this);
-        }
+        
 
         public void AddItem(LocationItem newItem)
         {
@@ -62,7 +48,22 @@ namespace SaveSystem
             if (_locationItems.Contains(newItem))
                 _locationItems.Remove(newItem);
         }
+        
+        public void UpdateItem(SaveSnap existingItemSnap)
+        {
+            var itemSnapshot = _itemsSnapshot.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id));
+            if (itemSnapshot == null) return;
+            
+            _itemsSnapshot = _itemsSnapshot.Where(item => !item.Id.Equals(existingItemSnap.Id)).ToList();
+            _itemsSnapshot.Add(existingItemSnap);
+            
+            if (_locationItems.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id)) is LocationItem locationItem)
+                locationItem.FromSnap(existingItemSnap);
+            
+            World.Instance.UpdateLocation(this);
+        }
 
+        #region Savable
         public SaveSnap MakeSnap()
         {
             return new LocationSnap(Id, _itemsSnapshot);
@@ -90,5 +91,6 @@ namespace SaveSystem
             
             World.Instance.UpdateLocation(this);
         }
+        #endregion
     }
 }

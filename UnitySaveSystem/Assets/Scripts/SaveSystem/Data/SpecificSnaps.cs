@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using SaveSystem.Data;
 using UnityEngine;
 using System.Linq;
 using System;
@@ -7,7 +6,7 @@ using System;
 
 namespace SaveSystem.Data
 {
-    [System.Serializable]
+    [Serializable]
     public class LocationItemSnap : SaveSnap
     {
         public bool Exists { get; private set; }
@@ -24,7 +23,7 @@ namespace SaveSystem.Data
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class LocationSnap : SaveSnap
     {
         public SaveSnap[] Items { get; private set; } = Array.Empty<SaveSnap>();
@@ -49,7 +48,7 @@ namespace SaveSystem.Data
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class WorldSnap : SaveSnap
     {
         public SaveSnap[] Locations { get; private set; } = Array.Empty<SaveSnap>();
