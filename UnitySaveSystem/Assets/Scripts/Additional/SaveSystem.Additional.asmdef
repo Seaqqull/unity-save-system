@@ -1,10 +1,10 @@
 {
-    "name": "SaveSystem.Examples",
-    "rootNamespace": "SaveSystem.Examples",
+    "name": "SaveSystem.Additional",
+    "rootNamespace": "SaveSystem.Additional",
     "references": [
         "GUID:6cca03abf81484a2ea05b3182f92d83c",
         "GUID:a947b4539a07f4905842bb93c51e3313",
-        "GUID:adf125b029fc842e3a22b1be29a37faa"
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
