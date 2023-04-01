@@ -9,8 +9,8 @@ namespace SaveSystem.Processing.Import
     public class BinaryImporter : FileImporter<SnapshotDatabase>
     {
         public BinaryImporter(string folder, string file) : base(folder, file) { }
-        
-        
+
+
         protected override SnapshotDatabase ImportData(FileStream stream)
         {
             IFormatter formatter = new BinaryFormatter();
@@ -18,7 +18,7 @@ namespace SaveSystem.Processing.Import
 
             if (stream.Length <= 0)
                 return new SnapshotDatabase();
-            
+
             var data = (SnapshotDatabase)formatter.Deserialize(stream);
             return data;
         }

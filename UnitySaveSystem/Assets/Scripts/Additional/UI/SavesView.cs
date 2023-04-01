@@ -9,7 +9,7 @@ namespace SaveSystem.Additional.UI
 {
     public class SavesView : MonoBehaviour
     {
-        [SerializeField] private string _locationId;
+        [SerializeField] private string _worldName = World.WORLD_NAME;
         [SerializeField] private CallbackActionSO _onAccept;
         [SerializeField] private ObjectSelector _selector;
         [Space]
@@ -21,47 +21,37 @@ namespace SaveSystem.Additional.UI
 
         private void OnEnable()
         {
-            var snapshotIndex = 0;
-            foreach (var snapshot in SaveManager.Instance.Snapshots)
+            for(int i = 0; i < SaveManager.Instance.Snapshots.Count; i++)
             {
-                var worlds = snapshot.Data.
-                    Select(snapshot => snapshot as WorldSnap).Where(world => world != null);
-                foreach (var world in worlds)
+                var snapshotIndex = i;
+                var snapshot = SaveManager.Instance.Snapshots.ElementAt(i);
+                
+                var hasNeededWorld = snapshot.Data.
+                    Any(snapshot => (snapshot as WorldSnap)?.Worlds.Any(world => world.Equals(_worldName)) ?? false);
+                if (!hasNeededWorld)
+                    continue;
+                
+                
+                var saveView = Instantiate(_savePrefab, _container.transform);
+                    _saveButtons.Add(saveView);
+
+                saveView.Id = (snapshotIndex + 1).ToString();
+                saveView.Title = snapshot.Title;
+
+                var selectedSnapshot = snapshotIndex;
+                saveView.OnAcceptAction += () =>
                 {
-                    if (world.Locations.
-                            SingleOrDefault(locationSnap => locationSnap.Id.Equals(_locationId)) is LocationSnap location)
-                    {
-                        var saveView = Instantiate(_savePrefab, _container.transform);
-                        _saveButtons.Add(saveView);
+                    World.Instance.Clear();
+                    SaveManager.Instance.Load(snapshotIndex);
 
-                        saveView.Id = (snapshotIndex + 1).ToString();
-                        saveView.Title = snapshot.Title;
-
-                        var selectedSnapshot = snapshotIndex;
-                        saveView.OnAcceptAction += () =>
-                        {
-                            World.Instance.Clear();
-
-                            _onAccept.Do(SaveManager.Instance, () =>
-                            {
-                                var savableObjects = _selector.Select();
-                                foreach (var savableObject in savableObjects)
-                                    savableObject.FromSnap(
-                                        location.Items.SingleOrDefault(objectSnap =>
-                                            objectSnap.Id.Equals(savableObject.Id))
-                                    );
-                            });
-                        };
-                        saveView.OnRejectAction += () =>
-                        {
-                            SaveManager.Instance.DeleteSnapshot(selectedSnapshot);
-                            OnDisable();
-                            OnEnable();
-                        };
-                    }
-                }
-
-                snapshotIndex++;
+                    _onAccept.Do(SaveManager.Instance, () => { });
+                };
+                saveView.OnRejectAction += () =>
+                {
+                    SaveManager.Instance.DeleteSnapshot(selectedSnapshot);
+                    OnDisable();
+                    OnEnable();
+                };
             }
         }
 

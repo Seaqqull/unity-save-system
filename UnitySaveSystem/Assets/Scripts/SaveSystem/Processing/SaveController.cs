@@ -11,7 +11,7 @@ namespace SaveSystem
     public class SaveController
     {
         private const string DEFAULT_DATE_FORMAT = "HH:mm:ss MM/dd/yyyy";
-        
+
         private string _databaseFile;
 
         private SnapshotDatabase _database = new();
@@ -28,10 +28,10 @@ namespace SaveSystem
         {
             _workDatabasePath = databasePath;
             _databaseFile = databaseFile;
-            
+
             LoadSnapshots();
         }
-        
+
 
         private void LoadSnapshots()
         {
@@ -96,10 +96,10 @@ namespace SaveSystem
         {
             return ((index < 0) || (index >= _database.Snapshots.Count)) ? null : _database.Snapshots[index];
         }
-        
+
         public void SetSnapshotTitle(string title)
         {
-            _snapshot.Title = string.IsNullOrWhiteSpace(title) ? 
+            _snapshot.Title = string.IsNullOrWhiteSpace(title) ?
                 DefaultTitle : title;
         }
 
@@ -112,6 +112,12 @@ namespace SaveSystem
         {
             _database.Snapshots.Remove(snapshot);
             SaveSnapshots();
+        }
+        
+        public void AddToSnapshot(IEnumerable<SaveSnap> saveData)
+        {
+            foreach(var data in saveData)
+                AddToSnapshot(data);
         }
     }
 }
