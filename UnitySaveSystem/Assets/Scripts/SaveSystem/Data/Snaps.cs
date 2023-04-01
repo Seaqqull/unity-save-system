@@ -87,8 +87,12 @@ namespace SaveSystem.Data
     [Serializable]
     public class SaveSnapshot
     {
-        public string Title = string.Empty;
+        private long Time = DateTime.Now.ToBinary();
+
         public HashSet<SaveSnap> Data = new();
+        public string Title = string.Empty;
+        
+        public DateTime TimeInfo => DateTime.FromBinary(Time);
     }
 
     [Serializable]
