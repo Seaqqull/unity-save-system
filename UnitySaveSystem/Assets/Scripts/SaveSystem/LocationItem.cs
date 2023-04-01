@@ -8,7 +8,7 @@ namespace SaveSystem
     public class LocationItem : MonoBehaviour, ISavable
     {
         private bool _exists = true;
-        
+
         public string Id { get; private set; }
         public bool Exists
         {
@@ -37,11 +37,11 @@ namespace SaveSystem
                 Location.Instance.RemoveItem(this);
         }
 
-        
+
         private IEnumerator ConnectWithLocationRoutine()
         {
             yield return null;
-            
+
             if (Location.Instance != null)
                 Location.Instance.AddItem(this);
         }
@@ -66,12 +66,12 @@ namespace SaveSystem
         public virtual void FromSnap(SaveSnap data)
         {
             if (Id == null) InitializeId();
-            
+
             var itemData = data as LocationItemSnap;
-            if ((itemData == null) || !itemData.Id.Equals(Id))
+            if (itemData == null)
                 return;
-            
-            
+
+
             _exists = itemData.Exists;
             Location.Instance.AddItem(this);
 
