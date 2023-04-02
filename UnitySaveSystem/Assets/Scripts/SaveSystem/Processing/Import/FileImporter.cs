@@ -5,7 +5,7 @@ using System;
 namespace SaveSystem.Processing.Import
 {
     public abstract class FileImporter<TData> : IImporter<TData>
-        where TData : class 
+        where TData : class
     {
         private string _folder;
         private string _file;
@@ -16,19 +16,19 @@ namespace SaveSystem.Processing.Import
             _folder = folder;
             _file = file;
         }
-        
-        
+
+
         public virtual TData Import()
         {
             if (!Directory.Exists(_folder))
                 Directory.CreateDirectory(_folder);
             if (!File.Exists($"{_folder}/{_file}"))
                 File.Create($"{_folder}/{_file}");
-            
+
             using var fileHandler = new FileStream(
-                $"{_folder}/{_file}", 
-                FileMode.OpenOrCreate, 
-                FileAccess.Read, 
+                $"{_folder}/{_file}",
+                FileMode.OpenOrCreate,
+                FileAccess.Read,
                 FileShare.None);
 
             try
@@ -41,8 +41,8 @@ namespace SaveSystem.Processing.Import
                     $"[System] Error importing data from file: [{_folder + "/" + _file}] => {e.Message}");
             }
         }
-        
-        
+
+
         protected abstract TData ImportData(FileStream stream);
     }
 }

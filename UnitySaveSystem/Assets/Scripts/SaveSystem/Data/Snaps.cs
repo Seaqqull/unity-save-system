@@ -14,15 +14,15 @@ namespace SaveSystem.Data
         private Func<MonoBehaviour> _monoGetter;
         private Func<bool> _isMonoAccessible;
         private string _id = string.Empty;
-        
+
         public MonoBehaviour GetMono =>
             _monoGetter?.Invoke();
-        public bool MonoAccessible => 
+        public bool MonoAccessible =>
             _isMonoAccessible?.Invoke() ?? true;
         public string Id =>
             _id;
-        
-        
+
+
         public SaveSnap(MonoBehaviour behaviour)
         {
             _id = GetHash(behaviour);
@@ -39,7 +39,7 @@ namespace SaveSystem.Data
             _isMonoAccessible = isMonoAccessible;
         }
 
-        public void AssignGetter<T>(Func<T> monoGetter) 
+        public void AssignGetter<T>(Func<T> monoGetter)
             where T : MonoBehaviour, ISavable
         {
             _monoGetter = monoGetter;
@@ -51,7 +51,7 @@ namespace SaveSystem.Data
         {
             return obj._id.GetHashCode();
         }
-        
+
         public bool Equals(SaveSnap x, SaveSnap y)
         {
             if ((x == null) && (y == null))
@@ -61,17 +61,17 @@ namespace SaveSystem.Data
             return (x._id == y._id);
         }
         #endregion
-        
-        
+
+
         public static string GetHash(MonoBehaviour behaviour)
         {
             var gameObject = behaviour.gameObject;
             var position = gameObject.transform.position;
             var name = gameObject.name;
-            
+
             return GetHash(SHA256.Create(), name + position.ToString("F2"));
         }
-        
+
         public static string GetHash(SHA256 hashAlgorithm, string input)
         {
             var inputData = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
@@ -83,38 +83,42 @@ namespace SaveSystem.Data
             return hash.ToString();
         }
     }
-    
+
     [Serializable]
     public class SaveSnapshot
     {
-        public string Title = string.Empty;
+        private long Time = DateTime.Now.ToBinary();
+
         public HashSet<SaveSnap> Data = new();
+        public string Title = string.Empty;
+        
+        public DateTime TimeInfo => DateTime.FromBinary(Time);
     }
-    
+
     [Serializable]
     public class SnapshotDatabase : ISerializable
     {
         public List<SaveSnapshot> Snapshots { get; set; } = new ();
 
-        
+
         public SnapshotDatabase()
         {
             Snapshots = new List<SaveSnapshot>();
         }
-        
+
         public SnapshotDatabase(IEnumerable<SaveSnapshot> snapshots)
         {
             Snapshots = new List<SaveSnapshot>(snapshots);
         }
-        
-        public SnapshotDatabase(SnapshotDatabase database) : 
+
+        public SnapshotDatabase(SnapshotDatabase database) :
             this(database.Snapshots) { }
-        
+
         public SnapshotDatabase(SerializationInfo info, StreamingContext context)
         {
             Snapshots = (List<SaveSnapshot>) info.GetValue(nameof(Snapshots), typeof(List<SaveSnapshot>));
         }
-        
+
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {

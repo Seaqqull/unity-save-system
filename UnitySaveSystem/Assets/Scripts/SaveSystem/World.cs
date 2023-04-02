@@ -9,18 +9,21 @@ namespace SaveSystem
     public class World : SingleBehaviour<World>, ISavable
     {
         #region Constant
-        private const string WORLD_NAME = "Game";
+        public const string WORLD_NAME = "Game";
         #endregion
-        
-        private List<SaveSnap> _locationSnaps = new ();
+
+
         private Location _activeLocation;
-        
-        public string Id => 
+         private Dictionary<string, List<SaveSnap>> _locationSnaps = new ();
+        // Auto-save as dedicated world "Auto-save"
+        public string Id =>
             WORLD_NAME;
 
 
         private void Start()
         {
+            _locationSnaps.Add(WORLD_NAME, new List<SaveSnap>());
+
             SaveManager.Instance.AddToSavable(this);
         }
 
@@ -30,29 +33,47 @@ namespace SaveSystem
         }
 
 
-        public void Clear()
+        private List<SaveSnap> GetWorldLocations(string worldName)
         {
-            _locationSnaps.Clear();
+            if (_locationSnaps.TryGetValue(worldName ?? WORLD_NAME, out var locationSnap))
+                return locationSnap;
+
+            locationSnap = new List<SaveSnap>();
+            _locationSnaps.Add(worldName ?? WORLD_NAME, locationSnap);
+
+            return locationSnap;
+        }
+
+
+        public void Clear(string worldName = null)
+        {
+            if (worldName == null)
+                _locationSnaps.Clear();
+            else if (_locationSnaps.TryGetValue(worldName, out var snaps))
+                snaps.Clear();
         }
 
         public void AddLocation(Location newLocation)
         {
+            var worldName = string.IsNullOrEmpty(newLocation.WorldId) ? WORLD_NAME : newLocation.WorldId;
             _activeLocation = newLocation;
-            
-            var locationSnap = _locationSnaps.SingleOrDefault(location => location.Id.Equals(newLocation.Id));
+
+            var locationSnap = GetWorldLocations(worldName).SingleOrDefault(location => location.Id.Equals(newLocation.Id));
             if (locationSnap != null)
                 newLocation.FromSnap(locationSnap);
-            
-            _locationSnaps = _locationSnaps.Where(location => !location.Id.Equals(newLocation.Id)).ToList();
+
+            _locationSnaps[worldName] = GetWorldLocations(worldName).Where(location => !location.Id.Equals(newLocation.Id)).ToList();
             // _locations.Add(newLocation.MakeSnap());
         }
-        
+
         public void UpdateLocation(Location newLocation)
         {
             if (_activeLocation == newLocation)
             {
-                _locationSnaps = _locationSnaps.Where(location => !location.Id.Equals(newLocation.Id)).ToList();
-                _locationSnaps.Add(newLocation.MakeSnap());
+                var worldName = string.IsNullOrEmpty(newLocation.WorldId) ? WORLD_NAME : newLocation.WorldId;
+
+                _locationSnaps[worldName] = GetWorldLocations(worldName).Where(location => !location.Id.Equals(newLocation.Id)).ToList();
+                _locationSnaps[worldName].Add(newLocation.MakeSnap());
                 return;
             }
 
@@ -63,19 +84,27 @@ namespace SaveSystem
         #region Savable
         public SaveSnap MakeSnap()
         {
-            return new WorldSnap(Id, _locationSnaps);
+            return new WorldSnap(
+                Id, 
+                _locationSnaps.Keys, 
+                _locationSnaps.Values.Select(pair => pair.ToArray()));
         }
 
         public void FromSnap(SaveSnap data)
         {
             var worldData = data as WorldSnap;
-            if ((worldData == null) || !worldData.Id.Equals(Id))
+            if (worldData == null)
                 return;
-            
-            _locationSnaps = worldData.Locations.ToList();
+
+            _locationSnaps.Clear();
+
+            for(int i = 0; i < worldData.Worlds.Count(); i++)
+                _locationSnaps.Add(worldData.Worlds.ElementAt(i), worldData.Locations.ElementAt(i).ToList());
+
             if (_activeLocation != null)
             {
-                var locationSnap = _locationSnaps.SingleOrDefault(location => location.Id.Equals(_activeLocation.Id));
+                var locationSnap = GetWorldLocations(_activeLocation.WorldId)
+                    .SingleOrDefault(location => location.Id.Equals(_activeLocation.Id));
                 if (locationSnap != null)
                 {
                     _activeLocation.FromSnap(locationSnap);

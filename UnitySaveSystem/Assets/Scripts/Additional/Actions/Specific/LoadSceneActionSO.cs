@@ -7,7 +7,7 @@ using System;
 namespace SaveSystem.Additional.Actions.Specific
 {
     [CreateAssetMenu(fileName = "SceneLoadAction", menuName = "Actions/Simple/LoadScene", order = 0)]
-    public class SceneLoadActionSO : ActionSO
+    public class LoadSceneActionSO : ActionSO
     {
         [SerializeField] private int _sceneId;
 
@@ -24,8 +24,6 @@ namespace SaveSystem.Additional.Actions.Specific
         
         public override void Do()
         {
-            World.Instance.Clear();
-            
             SceneManager.LoadScene(_sceneId);
         }
         
