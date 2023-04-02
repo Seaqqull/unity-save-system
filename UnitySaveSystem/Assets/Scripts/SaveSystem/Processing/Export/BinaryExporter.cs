@@ -10,12 +10,12 @@ namespace SaveSystem.Processing.Export
     {
         public BinaryExporter(string folder, string file) : base(folder, file) { }
 
-        
+
         protected override void ExportData(FileStream stream, SnapshotDatabase data)
         {
             IFormatter formatter = new BinaryFormatter();
             stream.Position = 0;
-            
+
             formatter.Serialize(stream, data);
             stream.Close();
         }
