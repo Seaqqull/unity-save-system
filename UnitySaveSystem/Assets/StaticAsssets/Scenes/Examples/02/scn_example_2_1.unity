@@ -2916,6 +2916,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: a39f9b9a8efe94e6d9849db6e2b34a42, type: 2}
     - target: {fileID: 7957815276053258308, guid: 75d4778e5e23d41789dd84197a33b499, type: 3}
+      propertyPath: _worldName
+      value: second_world
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957815276053258308, guid: 75d4778e5e23d41789dd84197a33b499, type: 3}
       propertyPath: _locationId
       value: 21
       objectReference: {fileID: 0}

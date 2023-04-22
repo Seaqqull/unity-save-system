@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SaveSystem.Processing;
 using SaveSystem.Base;
 using SaveSystem.Data;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace SaveSystem
         [SerializeField] private string _databaseFile;
 
         private List<ISavable> _savables = new();
-        private SaveController _controller;
+        private ProcessingController _controller;
 
         public event Action<SaveSnapshot> OnLoad;
         public event Action OnSave;
@@ -27,13 +28,13 @@ namespace SaveSystem
         {
             base.Awake();
 
-            _controller = new SaveController(
+            _controller = new ProcessingController(
                 $"{Application.persistentDataPath}{_databasePath}",
                 _databaseFile);
         }
 
 
-        public void Save(string title = null)
+        private void SaveSnapshot(string title, SaveType saveType)
         {
             _controller.ClearSnapshot();
 
@@ -41,9 +42,32 @@ namespace SaveSystem
             foreach (var savable in _savables)
                 _controller.AddToSnapshot(savable.MakeSnap());
 
-            _controller.SaveSnapshot();
+            _controller.SaveSnapshot(saveType);
+        }
 
+
+        [ContextMenu("Clear")]
+        public void Clear()
+        {
+            _controller.ClearSnapshot();
+        }
+
+        [ContextMenu("Clear all")]
+        public void ClearAll()
+        {
+            _controller.ClearSnapshots();
+        }
+
+        public void Save(string title = null)
+        {
+            SaveSnapshot(title, SaveType.Ordinal);
+            
             OnSave?.Invoke();
+        }
+
+        public void AutoSave(string title = null)
+        {
+            SaveSnapshot(title, SaveType.AutoSave);
         }
 
 

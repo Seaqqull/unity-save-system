@@ -9,9 +9,8 @@ namespace SaveSystem.Additional.UI
 {
     public class SavesView : MonoBehaviour
     {
-        [SerializeField] private string _worldName = World.WORLD_NAME;
+        [SerializeField] private string _worldName = World.DEFAULT_WORLD_NAME;
         [SerializeField] private CallbackActionSO _onAccept;
-        [SerializeField] private ObjectSelector _selector;
         [Space]
         [SerializeField] private AcceptRejectButton _savePrefab;
         [SerializeField] private GameObject _container;
@@ -21,6 +20,7 @@ namespace SaveSystem.Additional.UI
 
         private void OnEnable()
         {
+            var saveNumber = 1;
             for(int i = 0; i < SaveManager.Instance.Snapshots.Count; i++)
             {
                 var snapshotIndex = i;
@@ -35,7 +35,7 @@ namespace SaveSystem.Additional.UI
                 var saveView = Instantiate(_savePrefab, _container.transform);
                     _saveButtons.Add(saveView);
 
-                saveView.Id = (snapshotIndex + 1).ToString();
+                saveView.Id = (saveNumber++).ToString();
                 saveView.Title = snapshot.Title;
 
                 var selectedSnapshot = snapshotIndex;
