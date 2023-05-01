@@ -9,20 +9,19 @@ namespace SaveSystem
     public class World : SingleBehaviour<World>, ISavable
     {
         #region Constant
-        public const string WORLD_NAME = "Game";
+        public const string DEFAULT_WORLD_NAME = "Game";
         #endregion
 
 
         private Location _activeLocation;
-         private Dictionary<string, List<SaveSnap>> _locationSnaps = new ();
-        // Auto-save as dedicated world "Auto-save"
+        private Dictionary<string, List<SaveSnap>> _locationSnaps = new ();
         public string Id =>
-            WORLD_NAME;
+            DEFAULT_WORLD_NAME;
 
 
         private void Start()
         {
-            _locationSnaps.Add(WORLD_NAME, new List<SaveSnap>());
+            _locationSnaps.Add(DEFAULT_WORLD_NAME, new List<SaveSnap>());
 
             SaveManager.Instance.AddToSavable(this);
         }
@@ -35,11 +34,11 @@ namespace SaveSystem
 
         private List<SaveSnap> GetWorldLocations(string worldName)
         {
-            if (_locationSnaps.TryGetValue(worldName ?? WORLD_NAME, out var locationSnap))
+            if (_locationSnaps.TryGetValue(worldName ?? DEFAULT_WORLD_NAME, out var locationSnap))
                 return locationSnap;
 
             locationSnap = new List<SaveSnap>();
-            _locationSnaps.Add(worldName ?? WORLD_NAME, locationSnap);
+            _locationSnaps.Add(worldName ?? DEFAULT_WORLD_NAME, locationSnap);
 
             return locationSnap;
         }
@@ -55,7 +54,7 @@ namespace SaveSystem
 
         public void AddLocation(Location newLocation)
         {
-            var worldName = string.IsNullOrEmpty(newLocation.WorldId) ? WORLD_NAME : newLocation.WorldId;
+            var worldName = string.IsNullOrEmpty(newLocation.WorldId) ? DEFAULT_WORLD_NAME : newLocation.WorldId;
             _activeLocation = newLocation;
 
             var locationSnap = GetWorldLocations(worldName).SingleOrDefault(location => location.Id.Equals(newLocation.Id));
@@ -70,7 +69,7 @@ namespace SaveSystem
         {
             if (_activeLocation == newLocation)
             {
-                var worldName = string.IsNullOrEmpty(newLocation.WorldId) ? WORLD_NAME : newLocation.WorldId;
+                var worldName = string.IsNullOrEmpty(newLocation.WorldId) ? DEFAULT_WORLD_NAME : newLocation.WorldId;
 
                 _locationSnaps[worldName] = GetWorldLocations(worldName).Where(location => !location.Id.Equals(newLocation.Id)).ToList();
                 _locationSnaps[worldName].Add(newLocation.MakeSnap());
