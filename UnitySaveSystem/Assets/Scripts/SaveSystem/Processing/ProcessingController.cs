@@ -123,6 +123,11 @@ namespace SaveSystem.Processing
         {
             return _database.Get(saveType)[^1];
         }
+        
+        public List<SaveSnapshot> GetSnapshots(SaveType saveType = SaveType.Ordinal)
+        {
+            return _database.Get(saveType);
+        }
 
         public SaveSnapshot GetSnapshot(int index, SaveType saveType = SaveType.Ordinal)
         {

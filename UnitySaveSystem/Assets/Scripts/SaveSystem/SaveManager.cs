@@ -18,7 +18,7 @@ namespace SaveSystem
         private ProcessingController _controller;
 
         public event Action<SaveSnapshot> OnLoad;
-        public event Action OnSave;
+        public event Action<SaveType> OnSave;
 
         public IReadOnlyCollection<SaveSnapshot> Snapshots =>
             _controller.Snapshots;
@@ -58,18 +58,31 @@ namespace SaveSystem
             _controller.ClearSnapshots();
         }
 
-        public void Save(string title = null)
+        public void Save(SaveType saveType = SaveType.Ordinal, string title = null)
         {
-            SaveSnapshot(title, SaveType.Ordinal);
+            SaveSnapshot(title, saveType);
+
+            OnSave?.Invoke(saveType);
+        }
+        
+        public SaveSnapshot Load(int snapshotIndex, SaveType saveType = SaveType.Ordinal)
+        {
+            var snapshot = _controller.GetSnapshot(snapshotIndex, saveType);
+            if (snapshot != null)
+            {
+                foreach (var savable in _savables)
+                foreach (var snap in snapshot.Data)
+                {
+                    if (snap.Id.Equals(savable.Id))
+                        savable.FromSnap(snap);
+                }
+            }
             
-            OnSave?.Invoke();
-        }
+            OnLoad?.Invoke(snapshot);
 
-        public void AutoSave(string title = null)
-        {
-            SaveSnapshot(title, SaveType.AutoSave);
+            return snapshot;
         }
-
+        
 
         public void RemoveFromSavable(string id)
         {
@@ -78,36 +91,25 @@ namespace SaveSystem
                 _savables.RemoveAt(savableIndex);
         }
 
-        public SaveSnapshot Load(int snapshotIndex)
-        {
-            var snapshot = _controller.GetSnapshot(snapshotIndex);
-            
-            foreach (var savable in _savables)
-            foreach (var snap in snapshot.Data)
-            {
-                if (snap.Id.Equals(savable.Id))
-                    savable.FromSnap(snap);
-            }
-            
-            OnLoad?.Invoke(snapshot);
-
-            return snapshot;
-        }
-
         public void AddToSavable(ISavable savable)
         {
             if (!_savables.Contains(savable))
                 _savables.Add(savable);
         }
 
-        public void DeleteSnapshot(int snapshotIndex)
-        {
-            _controller.RemoveSnapshot(Snapshots.ElementAt(snapshotIndex));
-        }
-
         public void RemoveFromSavable(ISavable savable)
         {
             _savables.Remove(savable);
+        }
+
+        public void DeleteSnapshot(int snapshotIndex, SaveType saveType = SaveType.Ordinal)
+        {
+            _controller.RemoveSnapshot(_controller.GetSnapshots(saveType).ElementAt(snapshotIndex), saveType);
+        }
+        
+        public IReadOnlyCollection<SaveSnapshot> GetSnapshots(SaveType saveType = SaveType.Ordinal)
+        {
+            return _controller.GetSnapshots(saveType);
         }
     }
 }

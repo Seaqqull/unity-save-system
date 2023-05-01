@@ -2,7 +2,7 @@ using SaveSystem.Data;
 using UnityEngine;
 
 
-namespace SaveSystem.Examples._1.Data
+namespace SaveSystem.Examples.Data
 {
     [System.Serializable]
     public class DraggableItemSnap : LocationItemSnap

@@ -10,6 +10,7 @@ namespace SaveSystem.Additional.UI
     public class SavesView : MonoBehaviour
     {
         [SerializeField] private string _worldName = World.DEFAULT_WORLD_NAME;
+        [SerializeField] private SaveType _saveType = SaveType.Ordinal;
         [SerializeField] private CallbackActionSO _onAccept;
         [Space]
         [SerializeField] private AcceptRejectButton _savePrefab;
@@ -20,11 +21,13 @@ namespace SaveSystem.Additional.UI
 
         private void OnEnable()
         {
+            var snapshots = SaveManager.Instance.GetSnapshots(_saveType);
             var saveNumber = 1;
-            for(int i = 0; i < SaveManager.Instance.Snapshots.Count; i++)
+            
+            for(int i = 0; i < snapshots.Count; i++)
             {
                 var snapshotIndex = i;
-                var snapshot = SaveManager.Instance.Snapshots.ElementAt(i);
+                var snapshot = snapshots.ElementAt(i);
                 
                 var hasNeededWorld = snapshot.Data.
                     Any(snapshot => (snapshot as WorldSnap)?.Worlds.Any(world => world.Equals(_worldName)) ?? false);
@@ -42,13 +45,13 @@ namespace SaveSystem.Additional.UI
                 saveView.OnAcceptAction += () =>
                 {
                     World.Instance.Clear();
-                    SaveManager.Instance.Load(snapshotIndex);
+                    SaveManager.Instance.Load(snapshotIndex, _saveType);
 
                     _onAccept.Do(SaveManager.Instance, () => { });
                 };
                 saveView.OnRejectAction += () =>
                 {
-                    SaveManager.Instance.DeleteSnapshot(selectedSnapshot);
+                    SaveManager.Instance.DeleteSnapshot(selectedSnapshot, _saveType);
                     OnDisable();
                     OnEnable();
                 };
@@ -61,6 +64,16 @@ namespace SaveSystem.Additional.UI
                 Destroy(_saveButtons[i].gameObject);
             
             _saveButtons.Clear();
+        }
+
+
+        public void UpdateView()
+        {
+            if (!gameObject.activeSelf)
+                return;
+            
+            OnDisable();
+            OnEnable();
         }
     }
 }

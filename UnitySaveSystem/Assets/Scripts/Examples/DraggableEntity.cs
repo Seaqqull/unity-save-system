@@ -1,11 +1,11 @@
 using Vector2 = UnityEngine.Vector2;
-using SaveSystem.Examples._1.Data;
+using SaveSystem.Examples.Data;
 using UnityEngine.EventSystems;
 using SaveSystem.Data;
 using UnityEngine;
 
 
-namespace SaveSystem.Examples.Examples._1
+namespace SaveSystem.Examples
 {
     public class DraggableEntity : LocationItem, 
         IBeginDragHandler, IDragHandler, IEndDragHandler,
