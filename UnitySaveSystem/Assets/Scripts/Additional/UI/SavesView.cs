@@ -44,7 +44,7 @@ namespace SaveSystem.Additional.UI
                 var selectedSnapshot = snapshotIndex;
                 saveView.OnAcceptAction += () =>
                 {
-                    World.Instance.Clear();
+                    World.Instance.ClearAll();
                     SaveManager.Instance.Load(snapshotIndex, _saveType);
 
                     _onAccept.Do(SaveManager.Instance, () => { });

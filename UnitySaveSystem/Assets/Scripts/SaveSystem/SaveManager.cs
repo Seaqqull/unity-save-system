@@ -4,6 +4,7 @@ using SaveSystem.Base;
 using SaveSystem.Data;
 using UnityEngine;
 using System.Linq;
+using System.IO;
 using System;
 
 
@@ -28,8 +29,9 @@ namespace SaveSystem
         {
             base.Awake();
 
+            
             _controller = new ProcessingController(
-                $"{Application.persistentDataPath}{_databasePath}",
+                Path.Combine(Application.persistentDataPath, _databasePath),
                 _databaseFile);
         }
 
@@ -39,8 +41,7 @@ namespace SaveSystem
             _controller.ClearSnapshot();
 
             _controller.SetSnapshotTitle(title);
-            foreach (var savable in _savables)
-                _controller.AddToSnapshot(savable.MakeSnap());
+            _controller.AddToSnapshot(_savables.Select(savable => savable.MakeSnap()));
 
             _controller.SaveSnapshot(saveType);
         }

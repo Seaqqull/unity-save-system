@@ -11,11 +11,18 @@ namespace SaveSystem
     {
         [SerializeField] private string _id;
         [SerializeField] private string _worldId;
+        [Space]
+        // So, in case of [false] the save will be performed in given cases:
+        // - AddLocation: of _activeLocation (in case, if not null), before assigning a new one
+        // - RemoveLocation: of  _activeLocation, before assigning null
+        // - MakeSnap: of -activeLocation, if not null
+        [SerializeField] private bool _continuousStateBackup;
 
         private List<LocationItem> _locationItems = new ();
-        private List<SaveSnap> _itemsSnapshot = new ();
+        private List<SaveSnap> _itemSnapshots = new ();
         private LocationSnap _locationSnap;
 
+        public bool ContinuousStateBackup => _continuousStateBackup;
         public string WorldId => _worldId;
         public string Id => _id;
 
@@ -26,23 +33,36 @@ namespace SaveSystem
                 World.Instance.AddLocation(this);
         }
 
+        private void OnDestroy()
+        {
+            if (World.Instance != null)
+                World.Instance.RemoveLocation(this);
+        }
+
+
+        private void TryItemFromSnap(LocationItem locationItem)
+        {
+            if (_locationSnap?.Items
+                    .SingleOrDefault(item => item.Id.Equals(locationItem.Id)) is not LocationItemSnap itemSnapshot)
+                return;
+            
+            _locationSnap = _locationSnap.UpdateSnap((item => !item.Id.Equals(locationItem.Id)));
+            locationItem.FromSnap(itemSnapshot);
+        }
+
 
         public void AddItem(LocationItem newItem)
         {
             if (!_locationItems.Contains(newItem))
                 _locationItems.Add(newItem);
 
-            _itemsSnapshot = _itemsSnapshot.Where(item => !item.Id.Equals(newItem.Id)).ToList();
-            _itemsSnapshot.Add(newItem.MakeSnap());
+            _itemSnapshots = _itemSnapshots.Where(item => !item.Id.Equals(newItem.Id)).ToList();
+            _itemSnapshots.Add(newItem.MakeSnap());
 
-            // Check whether there exists some item snapshot
-            if (_locationSnap?.Items.SingleOrDefault(item => item.Id.Equals(newItem.Id)) is LocationItemSnap itemSnapshot)
-            {
-                _locationSnap = _locationSnap.UpdateSnap((item => !item.Id.Equals(newItem.Id)));
-                newItem.FromSnap(itemSnapshot);
-            }
+            TryItemFromSnap(newItem);
 
-            World.Instance.UpdateLocation(this);
+            if (_continuousStateBackup)
+                World.Instance.UpdateLocation(this);
         }
 
         public void RemoveItem(LocationItem newItem)
@@ -53,22 +73,25 @@ namespace SaveSystem
 
         public void UpdateItem(SaveSnap existingItemSnap)
         {
-            var itemSnapshot = _itemsSnapshot.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id));
+            var itemSnapshot = _itemSnapshots.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id));
             if (itemSnapshot == null) return;
 
-            _itemsSnapshot = _itemsSnapshot.Where(item => !item.Id.Equals(existingItemSnap.Id)).ToList();
-            _itemsSnapshot.Add(existingItemSnap);
+            _itemSnapshots = _itemSnapshots.Where(item => !item.Id.Equals(existingItemSnap.Id)).ToList();
+            _itemSnapshots.Add(existingItemSnap);
 
             if (_locationItems.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id)) is LocationItem locationItem)
                 locationItem.FromSnap(existingItemSnap);
 
-            World.Instance.UpdateLocation(this);
+            if (_continuousStateBackup)
+                World.Instance.UpdateLocation(this);
         }
 
         #region Savable
         public SaveSnap MakeSnap()
         {
-            return new LocationSnap(Id, _itemsSnapshot);
+            // Special case, if not all data from [load] was processed by [item],
+            // for that purpose we use [Concat].
+            return new LocationSnap(Id, _itemSnapshots.Concat(_locationSnap?.Items ?? Enumerable.Empty<SaveSnap>()));
         }
 
         public void FromSnap(SaveSnap data)
@@ -77,18 +100,11 @@ namespace SaveSystem
             if ((_locationSnap == null))
                 return;
 
-            foreach (var locationItem in _locationItems)
-            {
-                if (locationItem == null) continue;
+            foreach (var locationItem in _locationItems.Where(locationItem => locationItem != null))
+                TryItemFromSnap(locationItem);
 
-                if (_locationSnap?.Items.SingleOrDefault(item => item.Id.Equals(locationItem.Id)) is LocationItemSnap itemSnapshot)
-                {
-                    _locationSnap = _locationSnap.UpdateSnap((item => !item.Id.Equals(locationItem.Id)));
-                    locationItem.FromSnap(itemSnapshot);
-                }
-            }
-
-            World.Instance.UpdateLocation(this);
+            if (_continuousStateBackup)
+                World.Instance.UpdateLocation(this);
         }
         #endregion
     }

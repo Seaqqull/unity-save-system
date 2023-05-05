@@ -14,14 +14,8 @@ namespace SaveSystem.Data
     [Serializable]
     public class SaveSnap : IEqualityComparer<SaveSnap>
     {
-        private Func<MonoBehaviour> _monoGetter;
-        private Func<bool> _isMonoAccessible;
         private string _id = string.Empty;
 
-        public MonoBehaviour GetMono =>
-            _monoGetter?.Invoke();
-        public bool MonoAccessible =>
-            _isMonoAccessible?.Invoke() ?? true;
         public string Id =>
             _id;
 
@@ -35,19 +29,6 @@ namespace SaveSystem.Data
         {
             _id = id;
         }
-
-
-        public void AssignAccessor(Func<bool> isMonoAccessible)
-        {
-            _isMonoAccessible = isMonoAccessible;
-        }
-
-        public void AssignGetter<T>(Func<T> monoGetter)
-            where T : MonoBehaviour, ISavable
-        {
-            _monoGetter = monoGetter;
-        }
-
 
         #region Comparison
         public int GetHashCode(SaveSnap obj)

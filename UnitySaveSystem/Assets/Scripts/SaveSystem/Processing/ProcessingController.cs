@@ -10,13 +10,14 @@ namespace SaveSystem.Processing
 {
     public class ProcessingController
     {
+        #region Constants
         private const string DEFAULT_DATE_FORMAT = "HH:mm:ss MM/dd/yyyy";
-
-        private string _databaseFile;
-
+        #endregion
+        
         private SnapshotDatabase _database = new();
         private SaveSnapshot _snapshot = new();
         private string _workDatabasePath;
+        private string _databaseFile;
 
         public IReadOnlyCollection<SaveSnapshot> Snapshots =>
             (_workDatabasePath == null) ? Array.Empty<SaveSnapshot>() : _database.Get();
@@ -109,7 +110,6 @@ namespace SaveSystem.Processing
         {
             try
             {
-                LoadSnapshots();
                 _database.Add(_snapshot, saveType);
                 SaveSnapshots();
             }
