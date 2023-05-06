@@ -16,7 +16,7 @@ namespace SaveSystem
             set
             {
                 _exists = value;
-                Location.Instance.AddItem(this);
+                Location.AddGlobally(this);
             }
         }
 
@@ -28,23 +28,14 @@ namespace SaveSystem
 
         protected virtual void Start()
         {
-            StartCoroutine(ConnectWithLocationRoutine());
+            Location.AddGlobally(this);
         }
 
         private void OnDestroy()
         {
-            if (Location.Instance != null)
-                Location.Instance.RemoveItem(this);
+            Location.RemoveGlobally(this);
         }
 
-
-        private IEnumerator ConnectWithLocationRoutine()
-        {
-            yield return null;
-
-            if (Location.Instance != null)
-                Location.Instance.AddItem(this);
-        }
 
         private void InitializeId()
         {
@@ -71,9 +62,8 @@ namespace SaveSystem
             if (itemData == null)
                 return;
 
-
             _exists = itemData.Exists;
-            Location.Instance.AddItem(this);
+            Location.AddGlobally(this);
 
             if (!_exists)
                 Destroy(gameObject);

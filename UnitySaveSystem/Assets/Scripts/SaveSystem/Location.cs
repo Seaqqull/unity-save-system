@@ -9,6 +9,24 @@ namespace SaveSystem
 {
     public class Location : SingleBehaviour<Location>, ISavable
     {
+        private static readonly List<LocationItem> _pendingItems = new();
+        
+        
+        public static void AddGlobally(LocationItem newItem)
+        {
+            if (Instance == null)
+                _pendingItems.Add(newItem);
+            else
+                Instance.Add(newItem);
+        }
+        
+        public static void RemoveGlobally(LocationItem item)
+        {
+            if (Instance != null)
+                Instance.Remove(item);
+        }
+
+
         [SerializeField] private string _id;
         [SerializeField] private string _worldId;
         [Space]
@@ -29,6 +47,10 @@ namespace SaveSystem
 
         private void Start()
         {
+            foreach (var item in _pendingItems)
+                Add(item);
+            _pendingItems.Clear();
+            
             if (World.Instance != null)
                 World.Instance.AddLocation(this);
         }
@@ -52,7 +74,7 @@ namespace SaveSystem
         }
 
 
-        public void AddItem(LocationItem newItem)
+        public void Add(LocationItem newItem)
         {
             if (!_locationItems.Contains(newItem))
                 _locationItems.Add(newItem);
@@ -66,7 +88,7 @@ namespace SaveSystem
                 World.Instance.UpdateLocation(this);
         }
 
-        public void RemoveItem(LocationItem newItem)
+        public void Remove(LocationItem newItem)
         {
             if (_locationItems.Contains(newItem))
                 _locationItems.Remove(newItem);

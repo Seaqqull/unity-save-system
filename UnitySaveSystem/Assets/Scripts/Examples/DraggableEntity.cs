@@ -37,8 +37,7 @@ namespace SaveSystem.Examples
         
         private void OnDestroy()
         {
-            if (Location.Instance != null)
-                Location.Instance.RemoveItem(this);
+            Location.RemoveGlobally(this);
         }
 
 
@@ -74,7 +73,7 @@ namespace SaveSystem.Examples
             _selection.SetActive(false);
             _dummy.SetActive(false);
             
-            Location.Instance.AddItem(this);
+            Location.AddGlobally(this);
         }
 
         public void OnBeginDrag(PointerEventData eventData)
@@ -107,7 +106,7 @@ namespace SaveSystem.Examples
             _transform.localPosition = itemData.Position;
             Exists = itemData.Exists;
             
-            Location.Instance.AddItem(this);
+            Location.AddGlobally(this);
 
             if (!Exists)
                 Destroy(gameObject);
