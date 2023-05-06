@@ -9,18 +9,18 @@ namespace SaveSystem
 {
     public class Location : SingleBehaviour<Location>, ISavable
     {
-        private static readonly List<LocationItem> _pendingItems = new();
+        private static readonly List<ISavable> _pendingItems = new();
         
         
-        public static void AddGlobally(LocationItem newItem)
+        public static void AddGlobally(ISavable item)
         {
             if (Instance == null)
-                _pendingItems.Add(newItem);
+                _pendingItems.Add(item);
             else
-                Instance.Add(newItem);
+                Instance.Add(item);
         }
         
-        public static void RemoveGlobally(LocationItem item)
+        public static void RemoveGlobally(ISavable item)
         {
             if (Instance != null)
                 Instance.Remove(item);
@@ -36,8 +36,8 @@ namespace SaveSystem
         // - MakeSnap: of -activeLocation, if not null
         [SerializeField] private bool _continuousStateBackup;
 
-        private List<LocationItem> _locationItems = new ();
         private List<SaveSnap> _itemSnapshots = new ();
+        private List<ISavable> _items = new ();
         private LocationSnap _locationSnap;
 
         public bool ContinuousStateBackup => _continuousStateBackup;
@@ -62,47 +62,47 @@ namespace SaveSystem
         }
 
 
-        private void TryItemFromSnap(LocationItem locationItem)
+        private void TryItemFromSnap(ISavable item)
         {
             var itemSnapshot = _locationSnap?.Items
-                .SingleOrDefault(item => item.Id.Equals(locationItem.Id)) as LocationItemSnap;
+                .SingleOrDefault(itemSnap => itemSnap.Id.Equals(item.Id));
             if (itemSnapshot == null)
                 return;
             
-            _locationSnap = _locationSnap.UpdateSnap((item => !item.Id.Equals(locationItem.Id)));
-            locationItem.FromSnap(itemSnapshot);
+            _locationSnap = _locationSnap.UpdateSnap(itemSnap => !itemSnap.Id.Equals(item.Id));
+            item.FromSnap(itemSnapshot);
         }
 
 
-        public void Add(LocationItem newItem)
+        public void Add(ISavable item)
         {
-            if (!_locationItems.Contains(newItem))
-                _locationItems.Add(newItem);
+            if (!_items.Contains(item))
+                _items.Add(item);
 
-            _itemSnapshots = _itemSnapshots.Where(item => !item.Id.Equals(newItem.Id)).ToList();
-            _itemSnapshots.Add(newItem.MakeSnap());
+            _itemSnapshots = _itemSnapshots.Where(itemSnap => !itemSnap.Id.Equals(item.Id)).ToList();
+            _itemSnapshots.Add(item.MakeSnap());
 
-            TryItemFromSnap(newItem);
+            TryItemFromSnap(item);
 
             if (_continuousStateBackup)
                 World.Instance.UpdateLocation(this);
         }
 
-        public void Remove(LocationItem newItem)
+        public void Remove(ISavable item)
         {
-            if (_locationItems.Contains(newItem))
-                _locationItems.Remove(newItem);
+            if (_items.Contains(item))
+                _items.Remove(item);
         }
 
         public void UpdateItem(SaveSnap existingItemSnap)
         {
-            var itemSnapshot = _itemSnapshots.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id));
+            var itemSnapshot = _itemSnapshots.SingleOrDefault(itemSnap => itemSnap.Id.Equals(existingItemSnap.Id));
             if (itemSnapshot == null) return;
 
             _itemSnapshots = _itemSnapshots.Where(item => !item.Id.Equals(existingItemSnap.Id)).ToList();
             _itemSnapshots.Add(existingItemSnap);
 
-            var locationItem = _locationItems.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id));
+            var locationItem = _items.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id));
             if (locationItem != null)
                 locationItem.FromSnap(existingItemSnap);
             
@@ -124,7 +124,7 @@ namespace SaveSystem
             if ((_locationSnap == null))
                 return;
 
-            foreach (var locationItem in _locationItems.Where(locationItem => locationItem != null))
+            foreach (var locationItem in _items.Where(locationItem => locationItem != null))
                 TryItemFromSnap(locationItem);
 
             if (_continuousStateBackup)

@@ -1,4 +1,3 @@
-using System.Collections;
 using SaveSystem.Data;
 using UnityEngine;
 
@@ -23,11 +22,7 @@ namespace SaveSystem
 
         protected virtual void Awake()
         {
-            if (Id == null) InitializeId();
-        }
-
-        protected virtual void Start()
-        {
+            InitializeId();
             Location.AddGlobally(this);
         }
 
@@ -42,11 +37,6 @@ namespace SaveSystem
             Id = SaveSnap.GetHash(this);
         }
 
-
-        public void UpdateItemState()
-        {
-            Exists = _exists;
-        }
 
         #region Savable
         public virtual SaveSnap MakeSnap()
