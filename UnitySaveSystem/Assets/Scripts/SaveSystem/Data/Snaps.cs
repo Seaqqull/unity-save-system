@@ -111,9 +111,8 @@ namespace SaveSystem.Data
         
         public List<SaveSnapshot> Get(SaveType saveType = SaveType.Ordinal)
         {
-            if (Snapshots.TryGetValue(saveType, out var snpashots))
-                return snpashots;
-            return new List<SaveSnapshot>();
+            return Snapshots.TryGetValue(saveType, out var snapshots) ? snapshots :
+                new List<SaveSnapshot>();
         }
         
         public void Remove(SaveSnapshot snapshot, SaveType saveType = SaveType.Ordinal)

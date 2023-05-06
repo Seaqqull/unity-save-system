@@ -8,6 +8,16 @@ using System;
 
 namespace SaveSystem.Processing
 {
+    public class OperationResult
+    {
+        public bool Success => Error == null;
+        public Exception Error { get; }
+
+            
+        public OperationResult(Exception e = null) =>
+            Error = e;
+    }
+    
     public class ProcessingController
     {
         #region Constants
@@ -19,17 +29,26 @@ namespace SaveSystem.Processing
         private string _workDatabasePath;
         private string _databaseFile;
 
+        private Action<OperationResult> _onSave;
+        private Action<OperationResult> _onLoad;
+
         public IReadOnlyCollection<SaveSnapshot> Snapshots =>
             (_workDatabasePath == null) ? Array.Empty<SaveSnapshot>() : _database.Get();
         private string DefaultTitle =>
             DateTime.Now.ToString(DEFAULT_DATE_FORMAT);
 
 
-        public ProcessingController(string databasePath, string databaseFile)
+        public ProcessingController(
+            string databasePath, 
+            string databaseFile, 
+            Action<OperationResult> onSave, 
+            Action<OperationResult> onLoad)
         {
             _workDatabasePath = databasePath;
             _databaseFile = databaseFile;
-
+            _onSave = onSave;
+            _onLoad = onLoad;
+            
             LoadSnapshots();
         }
 
@@ -40,10 +59,12 @@ namespace SaveSystem.Processing
             {
                 var importer = new BinaryImporter(_workDatabasePath, _databaseFile);
                 _database = new SnapshotDatabase(importer.Import());
+
+                _onLoad?.Invoke(new OperationResult());
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error occured during loading: {e.Message}");
+                _onLoad?.Invoke(new OperationResult(e));
             }
         }
 
@@ -53,10 +74,12 @@ namespace SaveSystem.Processing
             {
                 var exporter = new BinaryExporter(_workDatabasePath, _databaseFile);
                 exporter.Export(new SnapshotDatabase(_database));
+                
+                _onSave?.Invoke(new OperationResult());
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error occurred during saving: {e.Message}");
+                _onSave?.Invoke(new OperationResult(e));
             }
         }
 
@@ -71,17 +94,10 @@ namespace SaveSystem.Processing
 
         public void ClearSnapshots()
         {
-            try
-            {
-                ClearSnapshot();
+            ClearSnapshot();
 
-                _database.Snapshots.Clear();
-                SaveSnapshots();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            _database.Snapshots.Clear();
+            SaveSnapshots();
         }
 
         public void RemoveFromSnapshot(string id)
@@ -108,15 +124,8 @@ namespace SaveSystem.Processing
         
         public void SaveSnapshot(SaveType saveType = SaveType.Ordinal)
         {
-            try
-            {
-                _database.Add(_snapshot, saveType);
-                SaveSnapshots();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            _database.Add(_snapshot, saveType);
+            SaveSnapshots();
         }
 
         public SaveSnapshot GetLastSnapshot(SaveType saveType = SaveType.Ordinal)

@@ -42,8 +42,9 @@ namespace SaveSystem
 
         private void TryItemFromSnap(LocationItem locationItem)
         {
-            if (_locationSnap?.Items
-                    .SingleOrDefault(item => item.Id.Equals(locationItem.Id)) is not LocationItemSnap itemSnapshot)
+            var itemSnapshot = _locationSnap?.Items
+                .SingleOrDefault(item => item.Id.Equals(locationItem.Id)) as LocationItemSnap;
+            if (itemSnapshot == null)
                 return;
             
             _locationSnap = _locationSnap.UpdateSnap((item => !item.Id.Equals(locationItem.Id)));
@@ -79,9 +80,10 @@ namespace SaveSystem
             _itemSnapshots = _itemSnapshots.Where(item => !item.Id.Equals(existingItemSnap.Id)).ToList();
             _itemSnapshots.Add(existingItemSnap);
 
-            if (_locationItems.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id)) is LocationItem locationItem)
+            var locationItem = _locationItems.SingleOrDefault(item => item.Id.Equals(existingItemSnap.Id));
+            if (locationItem != null)
                 locationItem.FromSnap(existingItemSnap);
-
+            
             if (_continuousStateBackup)
                 World.Instance.UpdateLocation(this);
         }

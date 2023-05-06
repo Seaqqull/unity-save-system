@@ -14,11 +14,14 @@ namespace SaveSystem
 
 
         private Dictionary<string, List<SaveSnap>> _locationSnaps = new ();
+        private bool _suspendLocationSnapshot;
         private Location _activeLocation;
-
+        
         private string LocationWorld =>
             string.IsNullOrEmpty(_activeLocation.WorldId) ? DEFAULT_WORLD_NAME : _activeLocation.WorldId;
-        
+        private bool CanMakeLocationSnapshot =>
+            !_activeLocation.ContinuousStateBackup && !_suspendLocationSnapshot;
+
         public string Id =>
             DEFAULT_WORLD_NAME;
 
@@ -59,12 +62,18 @@ namespace SaveSystem
         
         public void ClearAll()
         {
+            if (_activeLocation != null)
+                _suspendLocationSnapshot = true;
+            
             foreach (var key in _locationSnaps.Keys)
                 Clear(key);
         }
 
         public void Clear(string worldName = null)
         {
+            if ((_activeLocation != null) && (_activeLocation.WorldId == worldName))
+                _suspendLocationSnapshot = true;
+            
             if (_locationSnaps.TryGetValue(worldName ?? DEFAULT_WORLD_NAME, out var snaps))
                 snaps.Clear();
         }
@@ -74,25 +83,26 @@ namespace SaveSystem
             if ((newLocation == _activeLocation) || (newLocation == null))
                 return;
             
-            if ((_activeLocation != null) && !_activeLocation.ContinuousStateBackup)
+            if ((_activeLocation != null) && CanMakeLocationSnapshot)
                 BackupActiveLocation();
-            
+
+            _suspendLocationSnapshot = false;
             _activeLocation = newLocation;
 
             var worldName = LocationWorld;
             var locationSnap = GetLocations(worldName)
-                .SingleOrDefault(location => location.Id.Equals(newLocation.Id));
+                .SingleOrDefault(location => location.Id.Equals(_activeLocation.Id));
             if (locationSnap != null)
-                newLocation.FromSnap(locationSnap);
+                _activeLocation.FromSnap(locationSnap);
 
             _locationSnaps[worldName] = GetLocations(worldName)
-                .Where(location => !location.Id.Equals(newLocation.Id)).ToList();
+                .Where(location => !location.Id.Equals(_activeLocation.Id)).ToList();
 
             // Case: Load -> Instantly save
             // We need to make a snapshot of the current location (in case, if no items are added to it),
             // otherwise the location's snapshot will be empty.
-            if (newLocation.ContinuousStateBackup)
-                _locationSnaps[worldName].Add(newLocation.MakeSnap());
+            if (_activeLocation.ContinuousStateBackup)
+                _locationSnaps[worldName].Add(_activeLocation.MakeSnap());
         }
 
         public void RemoveLocation(Location location)
@@ -100,8 +110,11 @@ namespace SaveSystem
             if ((location == null) || (_activeLocation != location))
                 return;
             
-            if (!_activeLocation.ContinuousStateBackup)
+            if (CanMakeLocationSnapshot)
+            {
+                _suspendLocationSnapshot = false;
                 BackupActiveLocation();
+            }
             _activeLocation = null;
         }
 
@@ -117,9 +130,12 @@ namespace SaveSystem
         #region Savable
         public SaveSnap MakeSnap()
         {
-            if ((_activeLocation != null) && !_activeLocation.ContinuousStateBackup)
+            if ((_activeLocation != null) && CanMakeLocationSnapshot)
+            {
+                _suspendLocationSnapshot = false;
                 BackupActiveLocation();
-            
+            }
+
             return new WorldSnap(
                 Id, 
                 _locationSnaps.Keys, 
@@ -128,25 +144,24 @@ namespace SaveSystem
 
         public void FromSnap(SaveSnap data)
         {
-            if (data is not WorldSnap worldData)
+            var worldData = data as WorldSnap;
+            if (worldData == null)
                 return;
 
             _locationSnaps.Clear();
 
-            for(int i = 0; i < worldData.Worlds.Count(); i++)
+            for(var i = 0; i < worldData.Worlds.Count(); i++)
                 _locationSnaps.Add(worldData.Worlds.ElementAt(i), worldData.Locations.ElementAt(i).ToList());
 
-            if (_activeLocation != null)
+            if (_activeLocation == null) return;
+            var locationSnap = GetLocations(_activeLocation.WorldId)
+                .SingleOrDefault(location => location.Id.Equals(_activeLocation.Id));
+            if (locationSnap != null)
             {
-                var locationSnap = GetLocations(_activeLocation.WorldId)
-                    .SingleOrDefault(location => location.Id.Equals(_activeLocation.Id));
-                if (locationSnap != null)
-                {
-                    _activeLocation.FromSnap(locationSnap);
-                    // Additionally we could do:
-                    // BackupActiveLocation();
-                    // But it's handled by the location itself.
-                }
+                _activeLocation.FromSnap(locationSnap);
+                // Additionally we could do:
+                // BackupActiveLocation();
+                // But it's handled by the location itself.
             }
         }
         #endregion

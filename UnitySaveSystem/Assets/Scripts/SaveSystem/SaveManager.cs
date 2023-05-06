@@ -18,8 +18,8 @@ namespace SaveSystem
         private List<ISavable> _savables = new();
         private ProcessingController _controller;
 
-        public event Action<SaveSnapshot> OnLoad;
-        public event Action<SaveType> OnSave;
+        private Action _onSuccess;
+        private Action _onFailure;
 
         public IReadOnlyCollection<SaveSnapshot> Snapshots =>
             _controller.Snapshots;
@@ -28,13 +28,33 @@ namespace SaveSystem
         protected override void Awake()
         {
             base.Awake();
-
             
             _controller = new ProcessingController(
                 Path.Combine(Application.persistentDataPath, _databasePath),
-                _databaseFile);
+                _databaseFile,
+                OnSave,
+                OnLoad);
         }
 
+        
+        private void OnLoad(OperationResult result)
+        {
+            if (!result.Success)
+                Debug.LogError($"Error occured during loading: {result.Error.Message}");
+        }
+
+        private void OnSave(OperationResult result)
+        {
+            if (!result.Success)
+            {
+                Debug.LogError($"Error occurred during saving: {result.Error.Message}");
+                _onFailure?.Invoke();
+            }
+            else
+            {
+                _onSuccess?.Invoke();
+            }
+        }
 
         private void SaveSnapshot(string title, SaveType saveType)
         {
@@ -59,27 +79,28 @@ namespace SaveSystem
             _controller.ClearSnapshots();
         }
 
-        public void Save(SaveType saveType = SaveType.Ordinal, string title = null)
+        public void Save(
+            SaveType saveType = SaveType.Ordinal, 
+            string title = null, 
+            Action onSuccess = null, Action onFailure = null)
         {
+            _onSuccess = onSuccess;
+            _onFailure = onFailure;
+            
             SaveSnapshot(title, saveType);
-
-            OnSave?.Invoke(saveType);
+            
+            _onSuccess = null;
+            _onFailure = null;
         }
         
         public SaveSnapshot Load(int snapshotIndex, SaveType saveType = SaveType.Ordinal)
         {
             var snapshot = _controller.GetSnapshot(snapshotIndex, saveType);
-            if (snapshot != null)
-            {
-                foreach (var savable in _savables)
-                foreach (var snap in snapshot.Data)
-                {
-                    if (snap.Id.Equals(savable.Id))
-                        savable.FromSnap(snap);
-                }
-            }
+            if (snapshot == null) return snapshot;
             
-            OnLoad?.Invoke(snapshot);
+            foreach (var savable in _savables)
+            foreach (var snap in snapshot.Data.Where(snap => snap.Id.Equals(savable.Id)))
+                savable.FromSnap(snap);
 
             return snapshot;
         }

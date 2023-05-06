@@ -78,7 +78,7 @@ namespace SaveSystem.Data
         public IEnumerable<SaveSnap> GetWorldInfo(string worldName)
         {
             var worldIndex = -1;
-            for(int i = 0; (_worlds != null) && (i < _worlds.Length) && (worldIndex == -1); i++)
+            for(var i = 0; (_worlds != null) && (i < _worlds.Length) && (worldIndex == -1); i++)
                 if (_worlds[i].Equals(worldName))
                     worldIndex = i;
             
@@ -88,7 +88,7 @@ namespace SaveSystem.Data
         public void RemoveLocation(string locationId, string worldId)
         {
             var world = _worlds
-                .Select((name, index) => (name: name, index: index))
+                .Select((name, index) => (name, index))
                 .SingleOrDefault(world => world.name.Equals(worldId));
             if (world.name == null)
                 return;
