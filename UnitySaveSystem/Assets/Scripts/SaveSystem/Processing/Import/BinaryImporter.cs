@@ -13,11 +13,11 @@ namespace SaveSystem.Processing.Import
 
         protected override SnapshotDatabase ImportData(FileStream stream)
         {
-            IFormatter formatter = new BinaryFormatter();
-            stream.Position = 0;
-
             if (stream.Length <= 0)
                 return new SnapshotDatabase();
+
+            IFormatter formatter = new BinaryFormatter();
+            stream.Position = 0;
 
             var data = (SnapshotDatabase)formatter.Deserialize(stream);
             return data;

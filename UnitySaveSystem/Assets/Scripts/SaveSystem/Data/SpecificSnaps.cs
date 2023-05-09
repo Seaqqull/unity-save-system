@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 using System.Linq;
 using System;
@@ -6,10 +7,10 @@ using System;
 
 namespace SaveSystem.Data
 {
-    [Serializable]
+    [Serializable] [JsonObject(MemberSerialization.OptIn)]
     public class LocationItemSnap : SaveSnap
     {
-        public bool Exists { get; private set; }
+        [JsonProperty] public bool Exists { get; private set; }
 
 
         public LocationItemSnap(MonoBehaviour behaviour, bool exists = true) : base(behaviour)
@@ -21,12 +22,14 @@ namespace SaveSystem.Data
         {
             Exists = exists;
         }
+
+        public LocationItemSnap() { }
     }
 
-    [Serializable]
+    [Serializable] [JsonObject(MemberSerialization.OptIn)]
     public class LocationSnap : SaveSnap
     {
-        public SaveSnap[] Items { get; private set; } = Array.Empty<SaveSnap>();
+        [JsonProperty] public SaveSnap[] Items { get; private set; } = Array.Empty<SaveSnap>();
 
 
         public LocationSnap(MonoBehaviour behaviour, IEnumerable<SaveSnap> items = null) : base(behaviour)
@@ -41,6 +44,8 @@ namespace SaveSystem.Data
                 Items = items.ToArray();
         }
 
+        public LocationSnap() { }
+
 
         public LocationSnap UpdateSnap(Func<SaveSnap, bool> itemsSelector)
         {
@@ -48,11 +53,11 @@ namespace SaveSystem.Data
         }
     }
 
-    [Serializable]
+    [Serializable] [JsonObject(MemberSerialization.OptIn)]
     public class WorldSnap : SaveSnap
     {
-        private SaveSnap[][] _locations = Array.Empty<SaveSnap[]>();
-        private string[] _worlds = Array.Empty<string>();
+        [JsonProperty] private SaveSnap[][] _locations = Array.Empty<SaveSnap[]>();
+        [JsonProperty] private string[] _worlds = Array.Empty<string>();
 
         public IEnumerable<IEnumerable<SaveSnap>> Locations => _locations;
         public IEnumerable<string> Worlds => _worlds;
@@ -73,6 +78,8 @@ namespace SaveSystem.Data
             if (worlds != null)
                 _worlds = worlds.ToArray();
         }
+
+        public WorldSnap() { }
 
 
         public IEnumerable<SaveSnap> GetWorldInfo(string worldName)

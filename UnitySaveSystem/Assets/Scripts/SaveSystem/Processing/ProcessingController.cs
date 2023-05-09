@@ -2,7 +2,6 @@ using SaveSystem.Processing.Export;
 using SaveSystem.Processing.Import;
 using System.Collections.Generic;
 using SaveSystem.Data;
-using UnityEngine;
 using System;
 
 
@@ -64,6 +63,7 @@ namespace SaveSystem.Processing
             }
             catch (Exception e)
             {
+                _database = new SnapshotDatabase();
                 _onLoad?.Invoke(new OperationResult(e));
             }
         }

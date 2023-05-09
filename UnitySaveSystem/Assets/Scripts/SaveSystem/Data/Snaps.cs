@@ -1,6 +1,7 @@
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -11,10 +12,10 @@ namespace SaveSystem.Data
 {
     public enum SaveType { Ordinal, AutoSave, Special }
 
-    [Serializable]
+    [Serializable] [JsonObject(MemberSerialization.OptIn)]
     public class SaveSnap : IEqualityComparer<SaveSnap>
     {
-        private string _id = string.Empty;
+        [JsonProperty] private string _id = string.Empty;
 
         public string Id =>
             _id;
@@ -29,6 +30,9 @@ namespace SaveSystem.Data
         {
             _id = id;
         }
+
+        public SaveSnap() { }
+
 
         #region Comparison
         public int GetHashCode(SaveSnap obj)
@@ -68,18 +72,18 @@ namespace SaveSystem.Data
         }
     }
 
-    [Serializable]
+    [Serializable] [JsonObject(MemberSerialization.OptIn)]
     public class SaveSnapshot
     {
-        private long Time = DateTime.Now.ToBinary();
+        [JsonProperty] private long Time = DateTime.Now.ToBinary();
 
-        public HashSet<SaveSnap> Data = new();
-        public string Title = string.Empty;
+        [JsonProperty] public HashSet<SaveSnap> Data = new();
+        [JsonProperty] public string Title = string.Empty;
         
         public DateTime TimeInfo => DateTime.FromBinary(Time);
     }
 
-    [Serializable]
+    [Serializable] [JsonObject(MemberSerialization.OptIn)]
     public sealed class SnapshotDatabase : ISerializable
     {
         #region Constants
@@ -88,7 +92,7 @@ namespace SaveSystem.Data
         #endregion
 
 
-        public Dictionary<SaveType, List<SaveSnapshot>> Snapshots { get; set; } = new();
+        [JsonProperty] public Dictionary<SaveType, List<SaveSnapshot>> Snapshots { get; set; } = new();
 
         
         public SnapshotDatabase(IDictionary<SaveType, List<SaveSnapshot>> snapshots)

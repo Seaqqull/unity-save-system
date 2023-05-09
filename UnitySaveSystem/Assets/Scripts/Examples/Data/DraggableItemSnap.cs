@@ -1,14 +1,15 @@
+using Newtonsoft.Json;
 using SaveSystem.Data;
 using UnityEngine;
 
 
 namespace SaveSystem.Examples.Data
 {
-    [System.Serializable]
+    [System.Serializable] [JsonObject(MemberSerialization.OptIn)]
     public class DraggableItemSnap : LocationItemSnap
     {
-        private float _positionX;
-        private float _positionY;
+        [JsonProperty] private float _positionX;
+        [JsonProperty] private float _positionY;
 
         public Vector2 Position => new (_positionX, _positionY);
 
@@ -24,5 +25,7 @@ namespace SaveSystem.Examples.Data
             _positionX = position.x;
             _positionY = position.y;
         }
+
+        public DraggableItemSnap() { }
     }
 }
