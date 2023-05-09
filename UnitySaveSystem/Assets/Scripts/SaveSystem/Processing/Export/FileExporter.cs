@@ -22,8 +22,6 @@ namespace SaveSystem.Processing.Export
         {
             if (!Directory.Exists(_folder))
                 Directory.CreateDirectory(_folder);
-            if (!File.Exists($"{_folder}/{_file}"))
-                File.Create($"{_folder}/{_file}");
 
             using var fileHandler = new FileStream(
                 $"{_folder}/{_file}",
