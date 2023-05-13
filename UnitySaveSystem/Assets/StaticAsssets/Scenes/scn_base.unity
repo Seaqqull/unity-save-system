@@ -233,6 +233,11 @@ MonoBehaviour:
   _dontDestroyOnLoad: 1
   _databasePath: 
   _databaseFile: save.dat
+  _importType: 0
+  _exportType: 0
+  _importProvider: {fileID: 0}
+  _exportProvider: {fileID: 0}
+  _processingProvider: {fileID: 0}
 --- !u!4 &115114425
 Transform:
   m_ObjectHideFlags: 0

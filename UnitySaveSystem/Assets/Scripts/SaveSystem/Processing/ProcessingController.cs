@@ -7,16 +7,6 @@ using System;
 
 namespace SaveSystem.Processing
 {
-    public class OperationResult
-    {
-        public bool Success => Error == null;
-        public Exception Error { get; }
-
-            
-        public OperationResult(Exception e = null) =>
-            Error = e;
-    }
-    
     public class ProcessingController
     {
         #region Constants
@@ -25,26 +15,27 @@ namespace SaveSystem.Processing
         
         private SnapshotDatabase _database = new();
         private SaveSnapshot _snapshot = new();
-        private string _workDatabasePath;
-        private string _databaseFile;
 
+        private Func<IExporter<SnapshotDatabase>> _exportProvider;
+        private Func<IImporter<SnapshotDatabase>> _importProvider;
+        
         private Action<OperationResult> _onSave;
         private Action<OperationResult> _onLoad;
 
         public IReadOnlyCollection<SaveSnapshot> Snapshots =>
-            (_workDatabasePath == null) ? Array.Empty<SaveSnapshot>() : _database.Get();
+            _database.Get();
         private string DefaultTitle =>
             DateTime.Now.ToString(DEFAULT_DATE_FORMAT);
 
 
         public ProcessingController(
-            string databasePath, 
-            string databaseFile, 
+            Func<IImporter<SnapshotDatabase>> importProvider, 
+            Func<IExporter<SnapshotDatabase>> exportProvider, 
             Action<OperationResult> onSave, 
             Action<OperationResult> onLoad)
         {
-            _workDatabasePath = databasePath;
-            _databaseFile = databaseFile;
+            _exportProvider = exportProvider;
+            _importProvider = importProvider;
             _onSave = onSave;
             _onLoad = onLoad;
             
@@ -56,7 +47,7 @@ namespace SaveSystem.Processing
         {
             try
             {
-                var importer = new BinaryImporter(_workDatabasePath, _databaseFile);
+                var importer = _importProvider();
                 _database = new SnapshotDatabase(importer.Import());
 
                 _onLoad?.Invoke(new OperationResult());
@@ -72,7 +63,7 @@ namespace SaveSystem.Processing
         {
             try
             {
-                var exporter = new BinaryExporter(_workDatabasePath, _databaseFile);
+                var exporter = _exportProvider();
                 exporter.Export(new SnapshotDatabase(_database));
                 
                 _onSave?.Invoke(new OperationResult());

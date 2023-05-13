@@ -1,4 +1,8 @@
+using SaveSystem.Processing.Export;
+using SaveSystem.Processing.Import;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
+using SaveSystem.Data.Providers;
 using SaveSystem.Processing;
 using SaveSystem.Base;
 using SaveSystem.Data;
@@ -14,6 +18,14 @@ namespace SaveSystem
     {
         [SerializeField] private string _databasePath;
         [SerializeField] private string _databaseFile;
+        [Header("Processing")] 
+        [SerializeField] private ProviderType _importType;
+        [SerializeField] private ProviderType _exportType;
+        [Space]
+        [SerializeField] private SnapshotsImporter _importProvider; 
+        [SerializeField] private SnapshotsExporter _exportProvider; 
+        [Space]
+        [SerializeField] private SnapshotsProvider _processingProvider; 
 
         private List<ISavable> _savables = new();
         private ProcessingController _controller;
@@ -28,12 +40,9 @@ namespace SaveSystem
         protected override void Awake()
         {
             base.Awake();
-            
-            _controller = new ProcessingController(
-                Path.Combine(Application.persistentDataPath, _databasePath),
-                _databaseFile,
-                OnSave,
-                OnLoad);
+
+            var providers = BuildProviders();
+            _controller = new ProcessingController(providers.Importer, providers.Exporter, OnSave, OnLoad);
         }
 
         
@@ -64,6 +73,28 @@ namespace SaveSystem
             _controller.AddToSnapshot(_savables.Select(savable => savable.MakeSnap()));
 
             _controller.SaveSnapshot(saveType);
+        }
+        
+        private (Func<IImporter<SnapshotDatabase>> Importer, Func<IExporter<SnapshotDatabase>> Exporter) BuildProviders()
+        {
+            var useProcessingProvider = (_exportType == ProviderType.Custom) &&
+                                        (_importType == ProviderType.Custom) && (_processingProvider != null);
+            if (useProcessingProvider)
+                return (() => _processingProvider.BuildImporter(), () => _processingProvider.BuildExporter());
+            
+            var useImportProvider = (_importType == ProviderType.Custom) && (_importProvider != null);
+            var useExportProvider = (_exportType == ProviderType.Custom) && (_exportProvider != null);
+            var fileProviderData = new FileProviderData()
+            {
+                File = _databaseFile,
+                Folder = Path.Combine(Application.persistentDataPath, _databasePath)
+            };
+
+            return (
+                useImportProvider ? () => _importProvider.Build() : 
+                    () => ProviderFabric.BuildImporter(_importType, fileProviderData),
+                useExportProvider ? () => _exportProvider.Build() : 
+                    () => ProviderFabric.BuildExporter(_exportType, fileProviderData));
         }
 
 

@@ -1,7 +1,6 @@
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 using SaveSystem.Data;
 using Newtonsoft.Json;
+using System.Text;
 using System.IO;
 
 
@@ -21,11 +20,11 @@ namespace SaveSystem.Processing.Export
 
         protected override void ExportData(FileStream stream, SnapshotDatabase data)
         {
-            var serializationData = JsonConvert.SerializeObject(data, _settings); 
-            IFormatter formatter = new BinaryFormatter();
-            stream.Position = 0;
+            var serializedData = JsonConvert.SerializeObject(data, _settings); 
 
-            formatter.Serialize(stream, serializationData);
+            stream.Position = 0;
+            stream.Write(Encoding.ASCII.GetBytes(serializedData));
+
             stream.Close();
         }
     }

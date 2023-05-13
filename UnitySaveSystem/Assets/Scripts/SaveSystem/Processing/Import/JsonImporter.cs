@@ -1,5 +1,3 @@
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 using SaveSystem.Data;
 using Newtonsoft.Json;
 using System.IO;
@@ -24,10 +22,24 @@ namespace SaveSystem.Processing.Import
             if (stream.Length <= 0)
                 return new SnapshotDatabase();
 
-            IFormatter formatter = new BinaryFormatter();
             stream.Position = 0;
 
-            var serializedData = (string)formatter.Deserialize(stream);
+            var byteData = new byte[stream.Length];
+            var numBytesToRead = (int)stream.Length;
+            var numBytesRead = 0;
+            
+            while (numBytesToRead > 0)
+            {
+                var bytesLeft = stream.Read(byteData, numBytesRead, numBytesToRead);
+                // Break when the end of the file is reached.
+                if (bytesLeft == 0)
+                    break;
+
+                numBytesRead += bytesLeft;
+                numBytesToRead -= bytesLeft;
+            } 
+            
+            var serializedData = System.Text.Encoding.Default.GetString(byteData);
             return JsonConvert.DeserializeObject<SnapshotDatabase>(serializedData, _settings);
         }
     }
