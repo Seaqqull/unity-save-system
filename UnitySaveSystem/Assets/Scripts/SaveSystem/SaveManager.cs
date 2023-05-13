@@ -1,7 +1,6 @@
 using SaveSystem.Processing.Export;
 using SaveSystem.Processing.Import;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 using SaveSystem.Data.Providers;
 using SaveSystem.Processing;
 using SaveSystem.Base;
@@ -14,7 +13,7 @@ using System;
 
 namespace SaveSystem
 {
-    public class SaveManager: SingleBehaviour<SaveManager>
+    public class SaveManager: SingleBehaviour<SaveManager>, ISaveManager
     {
         [SerializeField] private string _databasePath;
         [SerializeField] private string _databaseFile;
@@ -163,6 +162,28 @@ namespace SaveSystem
         public IReadOnlyCollection<SaveSnapshot> GetSnapshots(SaveType saveType = SaveType.Ordinal)
         {
             return _controller.GetSnapshots(saveType);
+        }
+
+        public void Initialize(ProcessingProvider<SnapshotDatabase> provider)
+        {
+            _controller = new ProcessingController(provider.BuildImporter, provider.BuildExporter, OnSave, OnLoad);
+        }
+
+        public void Initialize(string databasePath, string databaseName, ProviderType importType, ProviderType exportType)
+        {
+            _databasePath = databasePath;
+            _databaseFile = databaseName;
+
+            _importType = importType;
+            _exportType = exportType;
+            
+            var providers = BuildProviders();
+            _controller = new ProcessingController(providers.Importer, providers.Exporter, OnSave, OnLoad);
+        }
+
+        public void Initialize(Func<IImporter<SnapshotDatabase>> importProvider, Func<IExporter<SnapshotDatabase>> exportProvider)
+        {
+            _controller = new ProcessingController(importProvider, exportProvider, OnSave, OnLoad);
         }
     }
 }

@@ -23,6 +23,11 @@ namespace SaveSystem.Data
 
     public static class ProviderFabric
     {
+        #region Constants
+        private const string WRONG_OPERATION_TYPE = "[ProviderFabric]: Custom providers can only be handled by " +
+                                                    "a dedicated implementation of [Export/Import]Provider or " +
+                                                    "ProcessingProvider for both.";
+        #endregion
         public static IImporter<SnapshotDatabase> BuildImporter(ProviderType providerType, ProviderData data)
         {
             switch (providerType)
@@ -34,7 +39,7 @@ namespace SaveSystem.Data
                     var jsonData = (data as FileProviderData)!;
                     return new JsonImporter(jsonData.Folder, jsonData.File);
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(providerType), providerType, null);
+                    throw new ArgumentException(WRONG_OPERATION_TYPE, nameof(providerType));
             }
         }
 
@@ -49,7 +54,7 @@ namespace SaveSystem.Data
                     var jsonData = (data as FileProviderData)!;
                     return new JsonExporter(jsonData.Folder, jsonData.File);
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(providerType), providerType, null);
+                    throw new ArgumentException(WRONG_OPERATION_TYPE, nameof(providerType));
             }
         }
     }
