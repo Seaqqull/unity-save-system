@@ -30,12 +30,14 @@ namespace SaveSystem
         {
             _locationSnaps.Add(DEFAULT_WORLD_NAME, new List<SaveSnap>());
 
-            SaveManager.Instance.AddToSavable(this);
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.AddToSavable(this);
         }
 
         private void OnDestroy()
         {
-            SaveManager.Instance.RemoveFromSavable(this);
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.RemoveFromSavable(this);
         }
 
 

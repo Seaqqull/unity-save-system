@@ -13,10 +13,10 @@ using System;
 
 namespace SaveSystem
 {
-    public class SaveManager: SingleBehaviour<SaveManager>, ISaveManager
+    public class SaveManager : SingleBehaviour<SaveManager>, ISaveManager
     {
-        [SerializeField] private string _databasePath;
-        [SerializeField] private string _databaseFile;
+        [SerializeField] private string _databasePath = string.Empty;
+        [SerializeField] private string _databaseFile = string.Empty;
         [Header("Processing")] 
         [SerializeField] private ProviderType _importType;
         [SerializeField] private ProviderType _exportType;

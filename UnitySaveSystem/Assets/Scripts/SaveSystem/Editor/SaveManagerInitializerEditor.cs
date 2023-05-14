@@ -6,8 +6,8 @@ using UnityEditor;
 
 namespace SaveSystem.Editor
 {
-    [CustomEditor(typeof(SaveManager))]
-    public class SaveManagerEditor : UnityEditor.Editor
+    [CustomEditor(typeof(SaveManagerInitializerSO))]
+    public class SaveManagerInitializerEditor : UnityEditor.Editor
     {
         #region Constants
         private const string PROCESSING_FIELD = "_processingProvider";
