@@ -12,18 +12,22 @@ namespace SaveSystem.Data
 {
     public enum SaveType { Ordinal, AutoSave, Special }
 
+    [Flags]
+    public enum DefaultIdInitialization { Name = 1, Location = 2, Both = Name | Location }
+
     [Serializable] [JsonObject(MemberSerialization.OptIn)]
     public class SaveSnap : IEqualityComparer<SaveSnap>
     {
         [JsonProperty] private string _id = string.Empty;
 
+        public virtual DefaultIdInitialization IdGeneration => DefaultIdInitialization.Both;
         public string Id =>
             _id;
 
 
         public SaveSnap(MonoBehaviour behaviour)
         {
-            _id = GetHash(behaviour);
+            _id = GetHash(behaviour, IdGeneration);
         }
 
         public SaveSnap(string id)
@@ -51,15 +55,6 @@ namespace SaveSystem.Data
         #endregion
 
 
-        public static string GetHash(MonoBehaviour behaviour)
-        {
-            var gameObject = behaviour.gameObject;
-            var position = gameObject.transform.position;
-            var name = gameObject.name;
-
-            return GetHash(SHA256.Create(), name + position.ToString("F2"));
-        }
-
         public static string GetHash(SHA256 hashAlgorithm, string input)
         {
             var inputData = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
@@ -69,6 +64,28 @@ namespace SaveSystem.Data
                 hash.Append(data.ToString("x2"));
 
             return hash.ToString();
+        }
+        
+        /// <summary>
+        ///     Generates unique Id based on MonoBehaviour's either name, position or combination of them.
+        /// </summary>
+        /// <remarks>In case of using
+        ///     <see cref="DefaultIdInitialization"/>.<see cref="DefaultIdInitialization.Location"/> position for objects
+        ///     in canvases differs for different resolutions.
+        /// </remarks>
+        /// <param name="behaviour">source <see cref="MonoBehaviour"/>.</param>
+        /// <param name="way">specifies parameters of the <see cref="MonoBehaviour"/> used to generate id.</param>
+        /// <returns>Unique Id.</returns>
+        public static string GetHash(MonoBehaviour behaviour, DefaultIdInitialization way = DefaultIdInitialization.Both)
+        {
+            var gameObject = behaviour.gameObject;
+            var hashInput = string.Empty;
+            if (way.HasFlag(DefaultIdInitialization.Name))
+                hashInput += gameObject.name;
+            if (way.HasFlag(DefaultIdInitialization.Location))
+                hashInput += gameObject.transform.position.ToString("F2");
+
+            return GetHash(SHA256.Create(), hashInput);
         }
     }
 
