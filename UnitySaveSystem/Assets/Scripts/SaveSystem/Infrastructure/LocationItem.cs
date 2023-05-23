@@ -1,4 +1,3 @@
-using System.Collections;
 using SaveSystem.Data;
 using UnityEngine;
 
@@ -16,46 +15,28 @@ namespace SaveSystem
             set
             {
                 _exists = value;
-                Location.Instance.AddItem(this);
+                Location.AddGlobally(this);
             }
         }
 
 
         protected virtual void Awake()
         {
-            if (Id == null) InitializeId();
-        }
-
-        protected virtual void Start()
-        {
-            StartCoroutine(ConnectWithLocationRoutine());
+            InitializeId();
+            Location.AddGlobally(this);
         }
 
         private void OnDestroy()
         {
-            if (Location.Instance != null)
-                Location.Instance.RemoveItem(this);
+            Location.RemoveGlobally(this);
         }
 
-
-        private IEnumerator ConnectWithLocationRoutine()
-        {
-            yield return null;
-
-            if (Location.Instance != null)
-                Location.Instance.AddItem(this);
-        }
 
         private void InitializeId()
         {
             Id = SaveSnap.GetHash(this);
         }
 
-
-        public void UpdateItemState()
-        {
-            Exists = _exists;
-        }
 
         #region Savable
         public virtual SaveSnap MakeSnap()
@@ -71,9 +52,8 @@ namespace SaveSystem
             if (itemData == null)
                 return;
 
-
             _exists = itemData.Exists;
-            Location.Instance.AddItem(this);
+            Location.AddGlobally(this);
 
             if (!_exists)
                 Destroy(gameObject);

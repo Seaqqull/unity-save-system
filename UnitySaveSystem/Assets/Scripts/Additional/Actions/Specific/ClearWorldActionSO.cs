@@ -8,7 +8,7 @@ namespace SaveSystem.Additional.Actions.Specific
     {
         public override void Do()
         {
-            World.Instance.Clear();
+            World.Instance.ClearAll();
         }
 
         public override void Do(MonoBehaviour mono)

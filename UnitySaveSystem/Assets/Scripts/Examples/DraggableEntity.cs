@@ -1,11 +1,11 @@
 using Vector2 = UnityEngine.Vector2;
-using SaveSystem.Examples._1.Data;
+using SaveSystem.Examples.Data;
 using UnityEngine.EventSystems;
 using SaveSystem.Data;
 using UnityEngine;
 
 
-namespace SaveSystem.Examples.Examples._1
+namespace SaveSystem.Examples
 {
     public class DraggableEntity : LocationItem, 
         IBeginDragHandler, IDragHandler, IEndDragHandler,
@@ -20,25 +20,36 @@ namespace SaveSystem.Examples.Examples._1
 
         private Transform _dummyTransform;
         private Vector2 _halfBoundsSize;
+        private Vector2 _scaledRectSize;
         private Transform _transform;
         private Vector2 _halfSize;
+        private Vector2 _rectSize;
 
 
         protected override void Awake()
         {
-            base.Awake();
-            
-            _halfBoundsSize = Vector2.Scale(_bounds.rect.size, new Vector2(0.5f, 0.5f));
-            _halfSize = Vector2.Scale(_size, new Vector2(0.5f, 0.5f));
+            _rectSize = _bounds.rect.size;
 
             _dummyTransform = _dummy.transform;
             _transform = transform;
+            
+            base.Awake();
+        }
+
+        private void Start()
+        {
+            _scaledRectSize = _bounds.rect.size;
+            var scaledSize = Vector2.Scale(
+                _size, 
+                new Vector2((_rectSize.x / _scaledRectSize.x), (_rectSize.y / _scaledRectSize.y)));
+
+            _halfBoundsSize = Vector2.Scale(_scaledRectSize, new Vector2(0.5f, 0.5f));
+            _halfSize = Vector2.Scale(scaledSize, new Vector2(0.5f, 0.5f));
         }
         
         private void OnDestroy()
         {
-            if (Location.Instance != null)
-                Location.Instance.RemoveItem(this);
+            Location.RemoveGlobally(this);
         }
 
 
@@ -46,14 +57,16 @@ namespace SaveSystem.Examples.Examples._1
         {
             if (position.x < _halfSize.x)
                 position.x = _halfSize.x;
-            else if (position.x > (_bounds.rect.width - _halfSize.x))
-                position.x = (_bounds.rect.width - _halfSize.x);
+            else if (position.x > (_rectSize.x - _halfSize.x))
+                position.x = (_rectSize.x - _halfSize.x);
             if (position.y < _halfSize.y)
                 position.y = _halfSize.y;
-            else if (position.y > (_bounds.rect.height - _halfSize.y))
-                position.y = (_bounds.rect.height - _halfSize.y);
+            else if (position.y > (_rectSize.y - _halfSize.y))
+                position.y = (_rectSize.y - _halfSize.y);
 
-            return position;
+            return new Vector2(
+                (position.x / _rectSize.x) * _scaledRectSize.x, 
+                (position.y / _rectSize.y) * _scaledRectSize.y);
         }
 
         public void Destroy()
@@ -74,7 +87,7 @@ namespace SaveSystem.Examples.Examples._1
             _selection.SetActive(false);
             _dummy.SetActive(false);
             
-            Location.Instance.AddItem(this);
+            Location.AddGlobally(this);
         }
 
         public void OnBeginDrag(PointerEventData eventData)
@@ -107,7 +120,7 @@ namespace SaveSystem.Examples.Examples._1
             _transform.localPosition = itemData.Position;
             Exists = itemData.Exists;
             
-            Location.Instance.AddItem(this);
+            Location.AddGlobally(this);
 
             if (!Exists)
                 Destroy(gameObject);

@@ -3,7 +3,7 @@
 
 namespace SaveSystem.Processing.Import
 {
-    interface IImporter<TData>
+    public interface IImporter<out TData>
         where TData : class
     {
         TData Import();

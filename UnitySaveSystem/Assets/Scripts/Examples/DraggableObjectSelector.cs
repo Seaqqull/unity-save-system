@@ -3,7 +3,7 @@ using SaveSystem.Additional;
 using UnityEngine;
 
 
-namespace SaveSystem.Examples.Examples._1
+namespace SaveSystem.Examples
 {
     [CreateAssetMenu(fileName = "DraggableSelector", menuName = "Selector/Draggable", order = 0)]
     public class DraggableObjectSelector : ObjectSelector

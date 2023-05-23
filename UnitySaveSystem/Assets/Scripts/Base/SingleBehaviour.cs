@@ -5,7 +5,8 @@ namespace SaveSystem.Base
 {
     public class SingleBehaviour<T> : MonoBehaviour where T : SingleBehaviour<T>
     {
-        [Header("Specific")] [SerializeField] private bool _rewritable;
+        [Header("Specific")]
+        [SerializeField] private bool _rewritable;
         [SerializeField] private bool _dontDestroyOnLoad;
 
         public static T Instance { get; private set; }

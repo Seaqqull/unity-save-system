@@ -9,9 +9,9 @@ namespace SaveSystem.Additional.UI
 {
     public class SavesView : MonoBehaviour
     {
-        [SerializeField] private string _worldName = World.WORLD_NAME;
+        [SerializeField] private string _worldName = World.DEFAULT_WORLD_NAME;
+        [SerializeField] private SaveType _saveType = SaveType.Ordinal;
         [SerializeField] private CallbackActionSO _onAccept;
-        [SerializeField] private ObjectSelector _selector;
         [Space]
         [SerializeField] private AcceptRejectButton _savePrefab;
         [SerializeField] private GameObject _container;
@@ -21,10 +21,13 @@ namespace SaveSystem.Additional.UI
 
         private void OnEnable()
         {
-            for(int i = 0; i < SaveManager.Instance.Snapshots.Count; i++)
+            var snapshots = SaveManager.Instance.GetSnapshots(_saveType);
+            var saveNumber = 1;
+            
+            for(int i = 0; i < snapshots.Count; i++)
             {
                 var snapshotIndex = i;
-                var snapshot = SaveManager.Instance.Snapshots.ElementAt(i);
+                var snapshot = snapshots.ElementAt(i);
                 
                 var hasNeededWorld = snapshot.Data.
                     Any(snapshot => (snapshot as WorldSnap)?.Worlds.Any(world => world.Equals(_worldName)) ?? false);
@@ -35,20 +38,20 @@ namespace SaveSystem.Additional.UI
                 var saveView = Instantiate(_savePrefab, _container.transform);
                     _saveButtons.Add(saveView);
 
-                saveView.Id = (snapshotIndex + 1).ToString();
+                saveView.Id = (saveNumber++).ToString();
                 saveView.Title = snapshot.Title;
 
                 var selectedSnapshot = snapshotIndex;
                 saveView.OnAcceptAction += () =>
                 {
-                    World.Instance.Clear();
-                    SaveManager.Instance.Load(snapshotIndex);
+                    World.Instance.ClearAll();
+                    SaveManager.Instance.Load(snapshotIndex, _saveType);
 
                     _onAccept.Do(SaveManager.Instance, () => { });
                 };
                 saveView.OnRejectAction += () =>
                 {
-                    SaveManager.Instance.DeleteSnapshot(selectedSnapshot);
+                    SaveManager.Instance.DeleteSnapshot(selectedSnapshot, _saveType);
                     OnDisable();
                     OnEnable();
                 };
@@ -61,6 +64,16 @@ namespace SaveSystem.Additional.UI
                 Destroy(_saveButtons[i].gameObject);
             
             _saveButtons.Clear();
+        }
+
+
+        public void UpdateView()
+        {
+            if (!gameObject.activeSelf)
+                return;
+            
+            OnDisable();
+            OnEnable();
         }
     }
 }
