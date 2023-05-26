@@ -11,7 +11,7 @@ namespace SaveSystem
     {
         #region Constants
         private const BindingFlags PROPERTY_GETTER = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-        private const string INSTANCE_PATH = "Seaqqull.SaveSystem/SaveSystemInitializer";
+        private const string INSTANCE_PATH = "Seaqqull.Save-System/SaveSystemInitializer";
         private const string DON_DESTROY_FIELD = "_dontDestroyOnLoad";
         private const string REWRITABLE_FIELD = "_rewritable";
         #endregion

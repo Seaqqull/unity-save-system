@@ -1,6 +1,6 @@
 {
-    "name": "SaveSystem.Base",
-    "rootNamespace": "SaveSystem.Base",
+    "name": "Seaqqull.Save-System",
+    "rootNamespace": "SaveSystem",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
