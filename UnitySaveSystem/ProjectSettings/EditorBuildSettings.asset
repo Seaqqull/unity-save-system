@@ -5,22 +5,22 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
-    path: Assets/com.seaqqull.save.system/Samples/StaticAsssets/Scenes/scn_base.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
-    path: Assets/com.seaqqull.save-system/Samples/ShowcaseSamples/StaticAsssets/Scenes/Examples/01/scn_example_1.unity
+    path: Assets/com.seaqqull.save-system.examples/StaticAsssets/Scenes/Examples/01/scn_example_1.unity
     guid: 64728c787baec4fe08b3f3a38f28388e
   - enabled: 1
-    path: Assets/com.seaqqull.save-system/Samples/ShowcaseSamples/StaticAsssets/Scenes/Examples/02/scn_example_2.unity
+    path: Assets/com.seaqqull.save-system.examples/StaticAsssets/Scenes/Examples/02/scn_example_2.unity
     guid: 017c78a2cb5af40e98d68ca7a309f6c2
   - enabled: 1
-    path: Assets/com.seaqqull.save-system/Samples/ShowcaseSamples/StaticAsssets/Scenes/Examples/02/scn_example_2_1.unity
+    path: Assets/com.seaqqull.save-system.examples/StaticAsssets/Scenes/Examples/02/scn_example_2_1.unity
     guid: f206d6606ad6340118b75e5393e87303
   - enabled: 1
-    path: Assets/com.seaqqull.save-system/Samples/ShowcaseSamples/StaticAsssets/Scenes/Examples/02/scn_example_2_2.unity
+    path: Assets/com.seaqqull.save-system.examples/StaticAsssets/Scenes/Examples/02/scn_example_2_2.unity
     guid: 7dc04708cd2964963a95beadb39df5ce
   - enabled: 1
-    path: Assets/com.seaqqull.save-system/Samples/ShowcaseSamples/StaticAsssets/Scenes/Examples/03/scn_example_3.unity
+    path: Assets/com.seaqqull.save-system.examples/StaticAsssets/Scenes/Examples/03/scn_example_3.unity
     guid: 4de8e6db32e9741eaaa5da4a5260ca3c
   m_configObjects: {}

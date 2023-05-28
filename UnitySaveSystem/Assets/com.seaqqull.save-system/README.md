@@ -12,4 +12,4 @@ Please refer to the [Save-System documentation] page for usage guides.
 
 
 [Save-System github repo]: https://github.com/Seaqqull/unity-save-system
-[Save-System documentation]: https://github.com/Seaqqull/unity-save-system
+[Save-System documentation]: https://github.com/Seaqqull/unity-save-system?path=/UnitySaveSystem/Assets/com.seaqqull.save-system/Documentation/com.seaqqull.save-system.md
