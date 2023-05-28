@@ -5,7 +5,9 @@
     "description": "Custom save system allowing to save or load game progression.",
     "unity": "2021.3",
     "unityRelease": "13f1",
-    "documentationUrl": "https://github.com/Seaqqull/unity-save-system",
+    "documentationUrl": "https://github.com/Seaqqull/unity-save-system?path=/UnitySaveSystem/Assets/com.seaqqull.save-system/Documentation/com.seaqqull.save-system.md",
+    "changelogUrl": "https://github.com/Seaqqull/unity-save-system?path=/UnitySaveSystem/Assets/com.seaqqull.save-system/CHANGELOG.md",
+    "licenseUrl" : "https://github.com/Seaqqull/unity-save-system?path=/UnitySaveSystem/Assets/com.seaqqull.save-system/LICENSE.md",
     "dependencies": { },
     "keywords": ["Save", "System"],
     "author": {
