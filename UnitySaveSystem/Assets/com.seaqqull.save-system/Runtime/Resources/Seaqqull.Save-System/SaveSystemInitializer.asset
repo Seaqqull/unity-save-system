@@ -17,6 +17,3 @@ MonoBehaviour:
   _databaseFile: save.dat
   _importType: 0
   _exportType: 0
-  _importProvider: {fileID: 0}
-  _exportProvider: {fileID: 0}
-  _processingProvider: {fileID: 0}
