@@ -3,6 +3,7 @@ Simple and easy to use unity package, allowing saving and loading game's progres
 
 ## Description
 Allows to save and load the game's progress using simple structure.
+[Documentation] contains step-by-step instruction of usage.
 
 ## Functionality
 - Maintain progress of the game,
@@ -35,3 +36,4 @@ project by:
 Samples are inside the [Save-System-Samples github repo].
 
 [Save-System-Samples github repo]: https://github.com/Seaqqull/unity-save-system-samples
+[Documentation]: https://github.com/Seaqqull/unity-save-system?path=/UnitySaveSystem/Assets/com.seaqqull.save-system/Documentation/com.seaqqull.save-system.md

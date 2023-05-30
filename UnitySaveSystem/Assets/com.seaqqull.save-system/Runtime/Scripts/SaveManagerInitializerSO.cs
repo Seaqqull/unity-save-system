@@ -1,18 +1,28 @@
-using SaveSystem.Data.Providers;
 using System.Reflection;
+using Newtonsoft.Json;
 using SaveSystem.Data;
 using SaveSystem.Base;
 using UnityEngine;
+using System;
 
 
 namespace SaveSystem
 {
     public class SaveManagerInitializerSO : ScriptableObject
     {
+        private struct InitializationData
+        {
+            public string DatabasePath;
+            public string DatabaseFile;
+            public ProviderType ImportType;
+            public ProviderType ExportType;
+        }
+
         #region Constants
         private const BindingFlags PROPERTY_GETTER = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
         private const string INSTANCE_PATH = "Seaqqull.Save-System/SaveSystemInitializer";
-        private const string DON_DESTROY_FIELD = "_dontDestroyOnLoad";
+        private const string INITIALIZATION_PATH = "Seaqqull.Save-System/SaveSystemSetup";
+        private const string DONT_DESTROY_FIELD = "_dontDestroyOnLoad";
         private const string REWRITABLE_FIELD = "_rewritable";
         #endregion
 
@@ -23,11 +33,6 @@ namespace SaveSystem
         [Header("Processing")] 
         [SerializeField] private ProviderType _importType;
         [SerializeField] private ProviderType _exportType;
-        [Space]
-        [SerializeField] private SnapshotsImporter _importProvider; 
-        [SerializeField] private SnapshotsExporter _exportProvider; 
-        [Space]
-        [SerializeField] private SnapshotsProvider _processingProvider; 
 
 
         [RuntimeInitializeOnLoadMethod]
@@ -36,11 +41,13 @@ namespace SaveSystem
             if (SaveManager.Instance != null)
                 return;
 
-            var initializationData = Resources.Load<SaveManagerInitializerSO>(INSTANCE_PATH);
-            if (!initializationData._autoInitialize)
+            var initializer = Resources.Load<SaveManagerInitializerSO>(INSTANCE_PATH);
+            if (!initializer._autoInitialize)
                 return;
             
             // Object initialization.
+            ProcessInitialization(initializer);
+            
             var obj = new GameObject("SaveSystem");
             obj.SetActive(false);
             DontDestroyOnLoad(obj);
@@ -52,38 +59,53 @@ namespace SaveSystem
             var saveManagerType = typeof(SaveManager);
             
             // SingleBehaviour fields.
-            var dontDestroyField = singleManagerType.GetField(DON_DESTROY_FIELD, PROPERTY_GETTER);
+            var dontDestroyField = singleManagerType.GetField(DONT_DESTROY_FIELD, PROPERTY_GETTER);
             
             dontDestroyField.SetValue(saveManager, true);
 
             // SaveManager fields.
-            var processingProvider = saveManagerType.GetField("_processingProvider", PROPERTY_GETTER);
-            var importProvider = saveManagerType.GetField("_importProvider", PROPERTY_GETTER);
-            var exportProvider = saveManagerType.GetField("_exportProvider", PROPERTY_GETTER);
             var databasePath = saveManagerType.GetField("_databasePath", PROPERTY_GETTER);
             var databaseFile = saveManagerType.GetField("_databaseFile", PROPERTY_GETTER);
             var importType = saveManagerType.GetField("_importType", PROPERTY_GETTER);
             var exportType = saveManagerType.GetField("_exportType", PROPERTY_GETTER);
-            
-            processingProvider.SetValue(saveManager, initializationData._processingProvider);
-            importProvider.SetValue(saveManager, initializationData._importProvider);
-            exportProvider.SetValue(saveManager, initializationData._exportProvider);
-            databasePath.SetValue(saveManager, initializationData._databasePath);
-            databaseFile.SetValue(saveManager, initializationData._databaseFile);
-            importType.SetValue(saveManager, initializationData._importType);
-            exportType.SetValue(saveManager, initializationData._exportType);
+
+            databasePath.SetValue(saveManager, initializer._databasePath);
+            databaseFile.SetValue(saveManager, initializer._databaseFile);
+            importType.SetValue(saveManager, initializer._importType);
+            exportType.SetValue(saveManager, initializer._exportType);
             
             // World.
             var world = obj.AddComponent<World>();
             var singleWorldType = typeof(SingleBehaviour<World>);
             
-            dontDestroyField = singleWorldType.GetField(DON_DESTROY_FIELD, PROPERTY_GETTER);
+            dontDestroyField = singleWorldType.GetField(DONT_DESTROY_FIELD, PROPERTY_GETTER);
             var rewritableField = singleWorldType.GetField(REWRITABLE_FIELD, PROPERTY_GETTER);
             
             dontDestroyField.SetValue(world, true);
             rewritableField.SetValue(world, true);
             
             obj.SetActive(true);
+        }
+        
+        private static void ProcessInitialization(SaveManagerInitializerSO initializer)
+        {
+            var initializationData = Resources.Load<TextAsset>(INITIALIZATION_PATH);
+            if (initializationData == null)
+                return;
+
+            try
+            {
+                var data = JsonConvert.DeserializeObject<InitializationData>(initializationData.text);
+                if (!Enum.IsDefined(typeof(ProviderType), data.ImportType) ||
+                    !Enum.IsDefined(typeof(ProviderType), data.ExportType))
+                    return;
+
+                initializer._databasePath = data.DatabasePath;
+                initializer._databaseFile = data.DatabaseFile;
+                initializer._importType = data.ImportType;
+                initializer._exportType = data.ExportType;
+            }
+            catch (Exception) { }
         }
     }
 }
