@@ -34,12 +34,12 @@ project by:
 
 ## Setup
 
-`Save-System` can be configured in two ways (Note: Custom import/export can only be configured using second way):
+`Save-System` can be configured in two ways:
 - Initialization file
-- Creation of GameObject with script
+- Creation of GameObject with attached MonoBehaviour
 
-
-In case if none of steps were performed, or error occurred during initialization via one of the defined steps. `Save-System` will be initialized with the given values:
+(Note: Custom import/export can only be configured using second way)
+In case if none of steps were performed, or error occurred during initialization via one of the defined steps `Save-System` will be initialized with the given values:
 ```json
 {
     "DatabasePath": "SaveSystem/",
@@ -51,7 +51,7 @@ In case if none of steps were performed, or error occurred during initialization
 
 ### Via initialization file
 
-Only usable, if first way wasn't done.
+Only usable, if second way wasn't done.
 1. Create `SaveSystemSetup.json` file inside the directory `Resources/Seaqqull.Save-System/`.
 2. Populate file with a given structure:
 ```json
@@ -68,7 +68,7 @@ Only usable, if first way wasn't done.
     * `0` or `Binary`
     * `1` or `Json`
 
-### Via creation of GameObject with script
+### Via creation of GameObject with attached MonoBehaviour
 
 1. Create `GameObject` inside the firstly-loaded game scene (Usually it is a scene with `Build Index` = 0).
 2. Add `SaveManager` script.
@@ -90,4 +90,4 @@ Only usable, if first way wasn't done.
     * Exporting: `SnapshotsExporter`
     * Both: `SnapshotsProvider`
  2. Create instance of that class (all them are inherited from ScriptableObject).
- 3. Assign to a given field.
+ 3. Assign it to a given field.
