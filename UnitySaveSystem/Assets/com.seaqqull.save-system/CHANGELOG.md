@@ -1,3 +1,8 @@
+## [0.3.3] - 2023-05-31
+
+### Fixed
+- After ClearAll command in [World] all worlds stayed empty (should have been deleted)
+
 ## [0.3.2] - 2023-05-31
 
 ### Added
