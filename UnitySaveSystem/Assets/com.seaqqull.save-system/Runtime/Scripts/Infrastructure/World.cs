@@ -69,6 +69,9 @@ namespace SaveSystem
             
             foreach (var key in _locationSnaps.Keys)
                 Clear(key);
+            
+            _locationSnaps.Clear();
+            _locationSnaps.Add(DEFAULT_WORLD_NAME, new List<SaveSnap>());
         }
 
         public void Clear(string worldName = null)
