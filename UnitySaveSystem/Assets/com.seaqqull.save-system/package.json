@@ -1,6 +1,6 @@
 {
     "name": "com.seaqqull.save-system",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "displayName": "Save System",
     "description": "Custom save system allowing to save or load game progression.",
     "unity": "2021.3",

@@ -1,3 +1,22 @@
+## [0.3.2] - 2023-05-31
+
+### Added
+- CustomExporter
+- CustomImporter
+- CustomProvider
+
+### Changed
+- Path for [CreateAssetMenu] actions
+
+## [0.3.1] - 2023-05-30
+
+### Added
+- Initialization via dedicated file [SaveSystemSetup]
+- Updated initialization documentation
+
+### Removed
+- Redundant custom editor for [SaveManagerInitializerSO]
+
 ## [0.3.0] - 2023-05-23
 
 ### Added
