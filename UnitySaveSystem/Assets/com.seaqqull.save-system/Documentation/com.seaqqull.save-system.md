@@ -58,8 +58,8 @@ Only usable, if first way wasn't done.
 {
     "DatabasePath": "File/Path/",
     "DatabaseFile": "fileName.format",
-    "ImportType": [Index of Name of type],
-    "ExportType": [Index of Name of type]
+    "ImportType": [Index or Name of type],
+    "ExportType": [Index or Name of type]
 }
 ```
 - `DatabasePath` - contains file folders path (Note: folders are relative to `Application.persistentDataPath`).
