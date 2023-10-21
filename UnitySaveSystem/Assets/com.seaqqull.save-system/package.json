@@ -1,6 +1,6 @@
 {
     "name": "com.seaqqull.save-system",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "displayName": "Save System",
     "description": "Custom save system allowing to save or load game progression.",
     "unity": "2021.3",
@@ -18,6 +18,6 @@
     "repository": {
         "url": "https://github.com/Seaqqull/unity-save-system.git",
         "type": "git",
-        "revision": "8f9477169009b976b142a8e00decf50a11276c1b"
+        "revision": "38bb7a69ae76c0cf8a1c9c278d1a58f1b1a842f3"
     }
 }

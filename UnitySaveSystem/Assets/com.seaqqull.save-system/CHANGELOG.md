@@ -1,3 +1,8 @@
+## [0.3.4] - 2023-10-21
+
+### Fixed
+- Support for Unity 2022+ version
+
 ## [0.3.3] - 2023-05-31
 
 ### Fixed
